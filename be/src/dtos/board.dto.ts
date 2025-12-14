@@ -1,0 +1,20 @@
+import { z } from "zod";
+
+export const createBoardSchema = z.object({
+  title: z.string().min(1),
+  workspaceId: z.string().uuid(),
+});
+
+export const updateBoardSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string().optional(),
+  imageUrl: z.string().optional(),
+});
+
+export const boardIdSchema = z.object({
+  boardId: z.string().uuid(),
+});
+
+export type CreateBoardInput = z.infer<typeof createBoardSchema>;
+export type UpdateBoardInput = z.infer<typeof updateBoardSchema>;
+export type BoardIdInput = z.infer<typeof boardIdSchema>;

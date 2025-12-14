@@ -6,25 +6,34 @@ import { Role } from "../prisma/generated/prisma/enums.js";
 import { ENTITY_TYPE, ACTION } from "../prisma/generated/prisma/enums.js";
 import { CopyListInput } from "../dtos/list.dto.js";
 
-export const copyList = async (userId: string, data: CopyListInput) => {
-  const list = await listRepo.findListWithCards(
-    data.listId,
-    data.boardId,
-    data.workspaceId
-  );
+export const copyList = async ({
+  userId,
+  data,
+}: {
+  userId: string;
+  data: CopyListInput;
+}) => {
+  const list = await listRepo.findListWithCards({
+    listId: data.listId,
+    boardId: data.boardId,
+    workspaceId: data.workspaceId,
+  });
   if (!list) throw new AppError("List not found", 404);
 
-  const member = await memberRepo.findMember(userId, data.workspaceId);
+  const member = await memberRepo.findMember({
+    userId,
+    workspaceId: data.workspaceId,
+  });
   if (!member) throw new AppError("Not a member of workspace", 403);
 
-  const newList = await listRepo.createListCopy(
-    data.boardId,
-    `${list.title} - Copy`,
-    list.tasks.map((t) => ({
+  const newList = await listRepo.createListCopy({
+    boardId: data.boardId,
+    title: `${list.title} - Copy`,
+    tasks: list.tasks.map((t) => ({
       title: t.title,
       description: t.description || "",
-    }))
-  );
+    })),
+  });
 
   await auditRepo.createAuditLog({
     workspaceId: data.workspaceId,
@@ -40,26 +49,44 @@ export const copyList = async (userId: string, data: CopyListInput) => {
   return newList;
 };
 
-export const trashList = async (userId: string, listId: string) => {
-  const list = await listRepo.findListByIdWithWorkspace(listId);
+export const trashList = async ({
+  userId,
+  listId,
+}: {
+  userId: string;
+  listId: string;
+}) => {
+  const list = await listRepo.findListByIdWithWorkspace({ listId });
   if (!list) throw new AppError("List not found", 404);
 
-  const member = await memberRepo.findMember(userId, list.board.workspaceId);
+  const member = await memberRepo.findMember({
+    userId,
+    workspaceId: list.board.workspaceId,
+  });
   if (!member || member.role === Role.MEMBER)
     throw new AppError("Not authorized", 403);
 
-  await listRepo.updateListTrash(listId, true);
+  await listRepo.updateListTrash({ listId, trash: true });
 };
 
-export const restoreList = async (userId: string, listId: string) => {
-  const list = await listRepo.findListByIdWithWorkspace(listId);
+export const restoreList = async ({
+  userId,
+  listId,
+}: {
+  userId: string;
+  listId: string;
+}) => {
+  const list = await listRepo.findListByIdWithWorkspace({ listId });
   if (!list) throw new AppError("List not found", 404);
 
-  const member = await memberRepo.findMember(userId, list.board.workspaceId);
+  const member = await memberRepo.findMember({
+    userId,
+    workspaceId: list.board.workspaceId,
+  });
   if (!member || member.role === Role.MEMBER)
     throw new AppError("Not authorized", 403);
 
-  await listRepo.updateListTrash(listId, false);
+  await listRepo.updateListTrash({ listId, trash: false });
 
   await auditRepo.createAuditLog({
     workspaceId: list.board.workspaceId,
@@ -73,13 +100,22 @@ export const restoreList = async (userId: string, listId: string) => {
   });
 };
 
-export const deleteList = async (userId: string, listId: string) => {
-  const list = await listRepo.findListByIdWithWorkspace(listId);
+export const deleteList = async ({
+  userId,
+  listId,
+}: {
+  userId: string;
+  listId: string;
+}) => {
+  const list = await listRepo.findListByIdWithWorkspace({ listId });
   if (!list) throw new AppError("List not found", 404);
 
-  const member = await memberRepo.findMember(userId, list.board.workspaceId);
+  const member = await memberRepo.findMember({
+    userId,
+    workspaceId: list.board.workspaceId,
+  });
   if (!member || member.role === Role.MEMBER)
     throw new AppError("Not authorized", 403);
 
-  await listRepo.deleteListById(listId);
+  await listRepo.deleteListById({ listId });
 };

@@ -15,24 +15,28 @@ export const join = catchAsync(async (req: Request, res: Response) => {
   }
 
   const workspaceId = req.params.workspaceId as string;
-  const member = await memberService.joinWorkspace(
+  const member = await memberService.joinWorkspace({
     workspaceId,
-    req.user.id,
-    validation.data.inviteCode
-  );
+    userId: req.user.id,
+    inviteCode: validation.data.inviteCode,
+  });
   res.status(201).json({ status: "success", data: member });
 });
 
 export const leave = catchAsync(async (req: Request, res: Response) => {
   const workspaceId = req.params.workspaceId as string;
-  await memberService.leaveWorkspace(req.user.id, workspaceId);
+  await memberService.leaveWorkspace({ userId: req.user.id, workspaceId });
   res.status(204).json({ status: "success", data: null });
 });
 
 export const remove = catchAsync(async (req: Request, res: Response) => {
   const workspaceId = req.params.workspaceId as string;
   const memberId = req.params.memberId as string;
-  await memberService.removeMember(req.user.id, workspaceId, memberId);
+  await memberService.removeMember({
+    actorId: req.user.id,
+    workspaceId,
+    targetMemberId: memberId,
+  });
   res.status(204).json({ status: "success", data: null });
 });
 
@@ -48,11 +52,11 @@ export const updateRole = catchAsync(async (req: Request, res: Response) => {
     throw new AppError(message, 400);
   }
 
-  const member = await memberService.updateRole(
-    req.user.id,
+  const member = await memberService.updateRole({
+    actorId: req.user.id,
     workspaceId,
-    memberId,
-    validation.data.role
-  );
+    targetMemberId: memberId,
+    newRole: validation.data.role,
+  });
   res.status(200).json({ status: "success", data: member });
 });

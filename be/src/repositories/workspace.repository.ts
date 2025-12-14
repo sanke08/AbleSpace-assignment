@@ -4,11 +4,15 @@ import {
   type UpdateWorkspaceInput,
 } from "../dtos/workspace.dto.js";
 
-export const createWorkspace = async (
-  creatorId: string,
-  data: CreateWorkspaceInput,
-  inviteCode: string
-) => {
+export const createWorkspace = async ({
+  creatorId,
+  data,
+  inviteCode,
+}: {
+  creatorId: string;
+  data: CreateWorkspaceInput;
+  inviteCode: string;
+}) => {
   return await db.workspace.create({
     data: {
       name: data.name,
@@ -18,7 +22,7 @@ export const createWorkspace = async (
   });
 };
 
-export const findWorkspaceById = async (id: string) => {
+export const findWorkspaceById = async ({ id }: { id: string }) => {
   return await db.workspace.findUnique({
     where: { id },
     include: {
@@ -27,7 +31,11 @@ export const findWorkspaceById = async (id: string) => {
   });
 };
 
-export const findWorkspacesByUserId = async (userId: string) => {
+export const findWorkspacesByUserId = async ({
+  userId,
+}: {
+  userId: string;
+}) => {
   return await db.workspace.findMany({
     where: {
       members: {
@@ -42,17 +50,20 @@ export const findWorkspacesByUserId = async (userId: string) => {
   });
 };
 
-export const updateWorkspace = async (
-  id: string,
-  data: UpdateWorkspaceInput
-) => {
+export const updateWorkspace = async ({
+  id,
+  data,
+}: {
+  id: string;
+  data: UpdateWorkspaceInput;
+}) => {
   return await db.workspace.update({
     where: { id },
     data,
   });
 };
 
-export const deleteWorkspace = async (id: string) => {
+export const deleteWorkspace = async ({ id }: { id: string }) => {
   return await db.workspace.delete({
     where: { id },
   });

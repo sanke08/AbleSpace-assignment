@@ -10,7 +10,10 @@ export const copy = catchAsync(async (req, res) => {
     throw new AppError(message, 400);
   }
 
-  const list = await listService.copyList(req.user.id, validation.data);
+  const list = await listService.copyList({
+    userId: req.user.id,
+    data: validation.data,
+  });
   res.status(201).json({ status: "success", data: list });
 });
 
@@ -21,7 +24,10 @@ export const trash = catchAsync(async (req, res) => {
     throw new AppError(message, 400);
   }
 
-  await listService.trashList(req.user.id, validation.data.listId);
+  await listService.trashList({
+    userId: req.user.id,
+    listId: validation.data.listId,
+  });
   res.status(200).json({ status: "success" });
 });
 
@@ -32,7 +38,10 @@ export const restore = catchAsync(async (req, res) => {
     throw new AppError(message, 400);
   }
 
-  await listService.restoreList(req.user.id, validation.data.listId);
+  await listService.restoreList({
+    userId: req.user.id,
+    listId: validation.data.listId,
+  });
   res.status(200).json({ status: "success" });
 });
 
@@ -43,6 +52,9 @@ export const remove = catchAsync(async (req, res) => {
     throw new AppError(message, 400);
   }
 
-  await listService.deleteList(req.user.id, validation.data.listId);
+  await listService.deleteList({
+    userId: req.user.id,
+    listId: validation.data.listId,
+  });
   res.status(204).send();
 });

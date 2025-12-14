@@ -5,36 +5,48 @@ import { ACTION, ENTITY_TYPE, Role } from "../prisma/generated/prisma/enums.js";
 
 import * as workspaceRepository from "../repositories/workspace.repository.js";
 
-export const addMember = async (workspaceId: string, userId: string) => {
+export const addMember = async ({
+  workspaceId,
+  userId,
+}: {
+  workspaceId: string;
+  userId: string;
+}) => {
   // Internal use (from Create Workspace) - no invite check
-  const member = await memberRepository.addMember(
+  const member = await memberRepository.addMember({
     workspaceId,
     userId,
-    Role.MEMBER
-  );
+    role: Role.MEMBER,
+  });
   return member;
 };
 
-export const joinWorkspace = async (
-  workspaceId: string,
-  userId: string,
-  inviteCode: string
-) => {
-  const workspace = await workspaceRepository.findWorkspaceById(workspaceId);
+export const joinWorkspace = async ({
+  workspaceId,
+  userId,
+  inviteCode,
+}: {
+  workspaceId: string;
+  userId: string;
+  inviteCode: string;
+}) => {
+  const workspace = await workspaceRepository.findWorkspaceById({
+    id: workspaceId,
+  });
   if (!workspace) throw new AppError("Workspace not found", 404);
 
   if (workspace.inviteCode !== inviteCode) {
     throw new AppError("Invalid invite code", 400);
   }
 
-  const existing = await memberRepository.findMember(workspaceId, userId);
+  const existing = await memberRepository.findMember({ workspaceId, userId });
   if (existing) throw new AppError("Already a member", 400);
 
-  const member = await memberRepository.addMember(
+  const member = await memberRepository.addMember({
     workspaceId,
     userId,
-    Role.MEMBER
-  );
+    role: Role.MEMBER,
+  });
 
   // Log activity
   await auditLogRepository.createAuditLog({
@@ -51,23 +63,36 @@ export const joinWorkspace = async (
   return member;
 };
 
-export const removeMember = async (
-  actorId: string,
-  workspaceId: string,
-  targetMemberId: string
-) => {
-  const workspace = await workspaceRepository.findWorkspaceById(workspaceId);
+export const removeMember = async ({
+  actorId,
+  workspaceId,
+  targetMemberId,
+}: {
+  actorId: string;
+  workspaceId: string;
+  targetMemberId: string;
+}) => {
+  const workspace = await workspaceRepository.findWorkspaceById({
+    id: workspaceId,
+  });
   if (!workspace) throw new AppError("Workspace not found", 404);
 
-  const actor = await memberRepository.findMember(workspaceId, actorId);
+  const actor = await memberRepository.findMember({
+    workspaceId,
+    userId: actorId,
+  });
   if (!actor || actor.role !== Role.ADMIN) {
     throw new AppError("Not authorized", 403);
   }
 
-  const memberToDelete = await memberRepository.findMemberById(targetMemberId);
+  const memberToDelete = await memberRepository.findMemberById({
+    id: targetMemberId,
+  });
   if (!memberToDelete) throw new AppError("Member not found", 404);
 
-  const deletedMember = await memberRepository.removeMember(targetMemberId);
+  const deletedMember = await memberRepository.removeMember({
+    id: targetMemberId,
+  });
 
   await auditLogRepository.createAuditLog({
     workspaceId,
@@ -82,23 +107,33 @@ export const removeMember = async (
 
   return deletedMember;
 };
-export const updateRole = async (
-  actorId: string,
-  workspaceId: string,
-  targetMemberId: string,
-  newRole: Role
-) => {
-  const workspace = await workspaceRepository.findWorkspaceById(workspaceId);
+export const updateRole = async ({
+  actorId,
+  workspaceId,
+  targetMemberId,
+  newRole,
+}: {
+  actorId: string;
+  workspaceId: string;
+  targetMemberId: string;
+  newRole: Role;
+}) => {
+  const workspace = await workspaceRepository.findWorkspaceById({
+    id: workspaceId,
+  });
   if (!workspace) throw new AppError("Workspace not found", 404);
 
-  const actor = await memberRepository.findMember(workspaceId, actorId);
+  const actor = await memberRepository.findMember({
+    workspaceId,
+    userId: actorId,
+  });
   if (!actor || actor.role !== Role.ADMIN)
     throw new AppError("Not authorized", 403);
 
-  const member = await memberRepository.updateMemberRole(
-    targetMemberId,
-    newRole
-  );
+  const member = await memberRepository.updateMemberRole({
+    id: targetMemberId,
+    role: newRole,
+  });
 
   await auditLogRepository.createAuditLog({
     workspaceId,
@@ -114,16 +149,24 @@ export const updateRole = async (
   return member;
 };
 
-export const leaveWorkspace = async (userId: string, workspaceId: string) => {
-  const workspace = await workspaceRepository.findWorkspaceById(workspaceId);
+export const leaveWorkspace = async ({
+  userId,
+  workspaceId,
+}: {
+  userId: string;
+  workspaceId: string;
+}) => {
+  const workspace = await workspaceRepository.findWorkspaceById({
+    id: workspaceId,
+  });
   if (!workspace) throw new AppError("Workspace not found", 404);
 
-  const member = await memberRepository.findMember(workspaceId, userId);
+  const member = await memberRepository.findMember({ workspaceId, userId });
   if (!member) throw new AppError("Not member", 404);
 
   if (workspace.creatorId === member.userId) {
     throw new AppError("Creator cannot leave workspace", 400);
   }
 
-  return await memberRepository.removeMember(member.id);
+  return await memberRepository.removeMember({ id: member.id });
 };

@@ -1,10 +1,14 @@
 import { db } from "../utils/db.js";
 
-export const findListWithCards = (
-  listId: string,
-  boardId: string,
-  workspaceId: string
-) => {
+export const findListWithCards = ({
+  listId,
+  boardId,
+  workspaceId,
+}: {
+  listId: string;
+  boardId: string;
+  workspaceId: string;
+}) => {
   return db.list.findFirst({
     where: {
       id: listId,
@@ -15,11 +19,15 @@ export const findListWithCards = (
   });
 };
 
-export const createListCopy = (
-  boardId: string,
-  title: string,
-  tasks: { title: string; description: string }[]
-) => {
+export const createListCopy = ({
+  boardId,
+  title,
+  tasks,
+}: {
+  boardId: string;
+  title: string;
+  tasks: { title: string; description: string }[];
+}) => {
   return db.list.create({
     data: {
       boardId,
@@ -30,7 +38,7 @@ export const createListCopy = (
   });
 };
 
-export const findListByIdWithWorkspace = (listId: string) => {
+export const findListByIdWithWorkspace = ({ listId }: { listId: string }) => {
   return db.list.findUnique({
     where: { id: listId },
     include: {
@@ -39,13 +47,19 @@ export const findListByIdWithWorkspace = (listId: string) => {
   });
 };
 
-export const updateListTrash = (listId: string, trash: boolean) => {
+export const updateListTrash = ({
+  listId,
+  trash,
+}: {
+  listId: string;
+  trash: boolean;
+}) => {
   return db.list.update({
     where: { id: listId },
     data: { trash },
   });
 };
 
-export const deleteListById = (listId: string) => {
+export const deleteListById = ({ listId }: { listId: string }) => {
   return db.list.delete({ where: { id: listId } });
 };

@@ -1,0 +1,16 @@
+import { Router } from "express";
+import * as boardController from "../controllers/board.controller.js";
+import { protect } from "../middlewares/auth.middleware.js";
+
+const router: Router = Router();
+
+router.use(protect);
+
+router.get("/", boardController.getBoards);
+router.post("/", boardController.createBoard);
+router.patch("/", boardController.updateBoard);
+router.patch("/:boardId/trash", boardController.trashBoard);
+router.patch("/:boardId/restore", boardController.restoreBoard);
+router.delete("/:boardId", boardController.deleteBoard);
+
+export default router;

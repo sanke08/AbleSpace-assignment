@@ -18,10 +18,10 @@ export const create = catchAsync(
     }
 
     const user = req.user as any;
-    const workspace = await workspaceService.createWorkspace(
-      user.id,
-      validation.data
-    );
+    const workspace = await workspaceService.createWorkspace({
+      userId: user.id,
+      data: validation.data,
+    });
     res.status(201).json({ status: "success", data: workspace });
   }
 );
@@ -40,15 +40,18 @@ export const update = catchAsync(async (req: Request, res: Response) => {
     throw new AppError(message, 400);
   }
 
-  const workspace = await workspaceService.updateWorkspace(
-    req.params.id as string,
-    req.user.id,
-    validation.data
-  );
+  const workspace = await workspaceService.updateWorkspace({
+    workspaceId: req.params.id as string,
+    userId: req.user.id,
+    data: validation.data,
+  });
   res.status(200).json({ status: "success", data: workspace });
 });
 
 export const deleteWs = catchAsync(async (req: Request, res: Response) => {
-  await workspaceService.deleteWorkspace(req.params.id as string, req.user.id);
+  await workspaceService.deleteWorkspace({
+    workspaceId: req.params.id as string,
+    userId: req.user.id,
+  });
   res.status(204).json({ status: "success", data: null });
 });
