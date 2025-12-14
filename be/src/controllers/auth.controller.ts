@@ -1,0 +1,48 @@
+import { type Request, type Response, type NextFunction } from "express";
+import { catchAsync } from "../utils/catchAsync.js";
+import * as authService from "../services/auth.service.js";
+import { registerSchema, loginSchema } from "../dtos/auth.dto.js";
+import { AppError } from "../utils/appError.js";
+
+const createSendToken = (
+  user: any,
+  token: string,
+  res: Response,
+  statusCode: number
+) => {
+  const cookieOptions = {
+    expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  };
+
+  res.cookie("jwt", token, cookieOptions);
+
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    data: { user },
+  });
+};
+
+export const register = catchAsync(async (req: Request, res: Response) => {
+  const validation = registerSchema.safeParse(req.body);
+  if (!validation.success) {
+    const message = validation.error?.issues[0]?.message || "Validation error";
+    throw new AppError(message, 400);
+  }
+
+  const { user, token } = await authService.register(validation.data);
+  createSendToken(user, token, res, 201);
+});
+
+export const login = catchAsync(async (req: Request, res: Response) => {
+  const validation = loginSchema.safeParse(req.body);
+  if (!validation.success) {
+    const message = validation.error?.issues[0]?.message || "Validation error";
+    throw new AppError(message, 400);
+  }
+
+  const { user, token } = await authService.login(validation.data);
+  createSendToken(user, token, res, 200);
+});
