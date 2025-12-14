@@ -1,7 +1,7 @@
 import express, { type Router } from "express";
 import * as workspaceController from "../controllers/workspace.controller.js";
-import * as memberController from "../controllers/member.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
+import memberRouter from "./member.routes.js";
 
 const router: Router = express.Router();
 
@@ -18,10 +18,12 @@ router
   .delete(workspaceController.deleteWs);
 
 // Member Routes nested under workspace logic
-router.post("/:workspaceId/join", memberController.join);
-router.delete("/:workspaceId/leave", memberController.leave);
+// router.post("/:workspaceId/members/join", memberController.join);
+// router.delete("/:workspaceId/members/leave", memberController.leave);
 
-router.patch("/:workspaceId/members/:memberId", memberController.updateRole);
-router.delete("/:workspaceId/members/:memberId", memberController.remove);
+// router.patch("/:workspaceId/members/:memberId", memberController.updateRole);
+// router.delete("/:workspaceId/members/:memberId", memberController.remove);
+
+router.use("/:workspaceId/members", memberRouter);
 
 export default router;
