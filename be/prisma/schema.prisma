@@ -96,11 +96,28 @@ model List {
   tasks Task[]
 }
 
+enum PRIORITY {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum STATUS {
+  TO_DO
+  IN_PROGRESS
+  REVIEW
+  COMPLETED
+}
+
 model Task {
-  id          String  @id @unique @default(cuid())
+  id          String    @id @unique @default(cuid())
   title       String
   description String?
-  trash       Boolean @default(false)
+  dueDate     DateTime?
+  priority    PRIORITY  @default(LOW)
+  status      STATUS    @default(TO_DO)
+  trash       Boolean   @default(false)
 
   assigneeId String?
   assignee   Member? @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
