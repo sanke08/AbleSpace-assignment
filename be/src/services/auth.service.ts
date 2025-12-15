@@ -40,3 +40,11 @@ export const login = async (input: LoginInput) => {
 
   return { user: userWithoutPassword, token };
 };
+
+export const findById = async (id: string) => {
+  const user = await userRepository.findUserById(id);
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+  return { user };
+};

@@ -55,3 +55,11 @@ export const deleteWs = catchAsync(async (req: Request, res: Response) => {
   });
   res.status(204).json({ status: "success", data: null });
 });
+
+export const get = catchAsync(async (req: Request, res: Response) => {
+  const workspace = await workspaceService.getWorkspaceById({
+    workspaceId: req.params.id as string,
+    userId: req.user.id,
+  });
+  res.status(200).json({ status: "success", data: workspace });
+});

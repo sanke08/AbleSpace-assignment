@@ -13,6 +13,5 @@ router.post("/copy", listController.copy);
 router.patch("/:listId/trash", listController.trash);
 router.patch("/:listId/restore", listController.restore);
 router.delete("/:listId", listController.deleteList);
-// router.delete("/:listId", listController.remove);
 
 export default router;

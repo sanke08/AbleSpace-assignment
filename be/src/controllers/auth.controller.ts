@@ -4,6 +4,7 @@ import * as authService from "../services/auth.service.js";
 import { registerSchema, loginSchema } from "../dtos/auth.dto.js";
 import { AppError } from "../utils/appError.js";
 import { createWorkspace } from "../services/workspace.service.js";
+import { db } from "../utils/db.js";
 
 const createSendToken = (
   user: any,
@@ -50,4 +51,20 @@ export const login = catchAsync(async (req: Request, res: Response) => {
 
   const { user, token } = await authService.login(validation.data);
   createSendToken(user, token, res, 200);
+});
+
+export const me = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user?.id; // set by protect middleware
+
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const { user } = await authService.findById(userId);
+
+  if (!user) {
+    return res.status(401).json({ message: "User not found" });
+  }
+
+  res.status(200).json({ data: user });
 });

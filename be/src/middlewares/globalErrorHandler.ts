@@ -7,6 +7,7 @@ export const globalErrorHandler = (
   res: Response,
   next: NextFunction
 ) => {
+  // console.log(err);
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
 

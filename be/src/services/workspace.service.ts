@@ -70,3 +70,16 @@ export const deleteWorkspace = async ({
   }
   return await workspaceRepository.deleteWorkspace({ id: workspaceId });
 };
+
+export const getWorkspaceById = async ({
+  workspaceId,
+  userId,
+}: {
+  workspaceId: string;
+  userId: string;
+}) => {
+  return await workspaceRepository.findWorkspaceById({
+    id: workspaceId,
+    userId,
+  });
+};

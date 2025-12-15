@@ -212,11 +212,6 @@ export const deleteList = async ({
   const list = await db.list.findUnique({ where: { id: listId } });
   if (!list) throw new AppError("List not found", 404);
 
-  // const deleted = await db.list.update({
-  //   where: { id: listId },
-  //   data: { trash: true },
-  // });
-
   const deleted = await listRepo.deleteListById({ listId });
 
   io.to(`board:${boardId}`).emit("list:deleted", deleted);

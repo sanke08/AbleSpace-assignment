@@ -2,7 +2,7 @@ import { Router } from "express";
 import * as boardController from "../controllers/board.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
 
-const router: Router = Router();
+const router: Router = Router({ mergeParams: true });
 
 router.use(protect);
 

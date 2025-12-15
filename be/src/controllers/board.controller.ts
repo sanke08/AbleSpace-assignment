@@ -1,5 +1,6 @@
 import { catchAsync } from "../utils/catchAsync.js";
 import * as boardService from "../services/board.service.js";
+import * as workspaceService from "../services/workspace.service.js";
 import {
   createBoardSchema,
   updateBoardSchema,
@@ -8,8 +9,16 @@ import {
 import { AppError } from "../utils/appError.js";
 
 export const getBoards = catchAsync(async (req, res) => {
-  const { name } = req.query as { name: string };
-  const boards = await boardService.getBoards({ name });
+  const { workspaceId } = req.params as { workspaceId: string };
+  if (!workspaceId) throw new AppError("Workspace ID is required", 400);
+  const workspace = await workspaceService.getWorkspaceById({
+    userId: req.user.id,
+    workspaceId,
+  });
+  if (!workspace) throw new AppError("Workspace not found", 404);
+  const boards = await boardService.getBoardsByWorkspaceId({
+    workspaceId: workspace.id,
+  });
   res.status(200).json({ status: "success", data: boards });
 });
 

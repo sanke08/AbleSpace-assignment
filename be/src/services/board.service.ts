@@ -9,6 +9,14 @@ export const getBoards = async ({ name }: { name: string }) => {
   return boardRepo.findBoardsByName({ name });
 };
 
+export const getBoardsByWorkspaceId = async ({
+  workspaceId,
+}: {
+  workspaceId: string;
+}) => {
+  return boardRepo.getBoardsByWorkspaceId({ workspaceId });
+};
+
 export const createBoard = async ({
   userId,
   title,

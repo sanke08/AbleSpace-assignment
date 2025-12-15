@@ -6,6 +6,22 @@ export const findBoardsByName = ({ name }: { name: string }) => {
   });
 };
 
+export const getBoardsByWorkspaceId = ({
+  workspaceId,
+}: {
+  workspaceId: string;
+}) => {
+  return db.workspace.findFirst({
+    where: { id: workspaceId },
+    select: {
+      id: true,
+      name: true,
+
+      boards: { select: { id: true, title: true } },
+    },
+  });
+};
+
 export const findBoardById = ({ boardId }: { boardId: string }) => {
   return db.board.findUnique({
     where: { id: boardId },
