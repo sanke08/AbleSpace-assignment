@@ -212,24 +212,15 @@ export const deleteList = async ({
   const list = await db.list.findUnique({ where: { id: listId } });
   if (!list) throw new AppError("List not found", 404);
 
-  const deleted = await db.list.update({
-    where: { id: listId },
-    data: { trash: true },
-  });
+  // const deleted = await db.list.update({
+  //   where: { id: listId },
+  //   data: { trash: true },
+  // });
+
+  const deleted = await listRepo.deleteListById({ listId });
 
   io.to(`board:${boardId}`).emit("list:deleted", deleted);
 
-  // await db.auditLog.create({
-  //   data: {
-  //     entityId: list.id,
-  //     entityType: ENTITY_TYPE.LIST,
-  //     entityTitle: list.title,
-  //     action: ACTION.DELETE,
-  //     userId,
-  //     userName: "snapshot",
-  //     userImage: "",
-  //   },
-  // });
   await auditRepo.createAuditLog({
     workspaceId,
     entityId: list.id,

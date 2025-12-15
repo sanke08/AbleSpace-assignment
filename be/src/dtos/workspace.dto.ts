@@ -10,7 +10,7 @@ export const updateWorkspaceSchema = z.object({
 });
 
 export const updateMemberRoleSchema = z.object({
-  role: z.nativeEnum(ROLE),
+  role: z.enum(ROLE),
 });
 
 export const joinWorkspaceSchema = z.object({

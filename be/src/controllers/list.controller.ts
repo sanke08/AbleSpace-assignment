@@ -93,9 +93,13 @@ export const updateList = catchAsync(async (req, res) => {
 });
 
 export const deleteList = catchAsync(async (req, res) => {
-  const { boardId, listId, workspaceId } = req.params;
-  if (!boardId || !listId || !workspaceId)
-    throw new AppError("Board ID, List ID and Workspace ID are required", 400);
+  const validation = listIdSchema.safeParse(req.params);
+  if (!validation.success) {
+    const message = validation.error?.issues[0]?.message || "Validation error";
+    throw new AppError(message, 400);
+  }
+
+  const { boardId, listId, workspaceId } = validation.data;
 
   await listService.deleteList({
     boardId,

@@ -3,6 +3,7 @@ import { catchAsync } from "../utils/catchAsync.js";
 import * as authService from "../services/auth.service.js";
 import { registerSchema, loginSchema } from "../dtos/auth.dto.js";
 import { AppError } from "../utils/appError.js";
+import { createWorkspace } from "../services/workspace.service.js";
 
 const createSendToken = (
   user: any,
@@ -33,6 +34,10 @@ export const register = catchAsync(async (req: Request, res: Response) => {
   }
 
   const { user, token } = await authService.register(validation.data);
+  await createWorkspace({
+    data: { name: "My Workspace" },
+    userId: user.id,
+  });
   createSendToken(user, token, res, 201);
 });
 
