@@ -1,5 +1,5 @@
 import { db } from "../utils/db.js";
-import { Role } from "../prisma/generated/prisma/enums.js";
+import { ROLE } from "../prisma/generated/prisma/enums.js";
 
 export const addMember = async ({
   workspaceId,
@@ -8,7 +8,7 @@ export const addMember = async ({
 }: {
   workspaceId: string;
   userId: string;
-  role: Role;
+  role: ROLE;
 }) => {
   return await db.member.create({
     data: {
@@ -52,7 +52,7 @@ export const updateMemberRole = async ({
   role,
 }: {
   id: string;
-  role: Role;
+  role: ROLE;
 }) => {
   return await db.member.update({
     where: { id },

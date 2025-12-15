@@ -17,13 +17,6 @@ router
   .patch(workspaceController.update)
   .delete(workspaceController.deleteWs);
 
-// Member Routes nested under workspace logic
-// router.post("/:workspaceId/members/join", memberController.join);
-// router.delete("/:workspaceId/members/leave", memberController.leave);
-
-// router.patch("/:workspaceId/members/:memberId", memberController.updateRole);
-// router.delete("/:workspaceId/members/:memberId", memberController.remove);
-
 router.use("/:workspaceId/members", memberRouter);
 
 export default router;

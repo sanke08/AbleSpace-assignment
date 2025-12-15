@@ -2,8 +2,8 @@ import * as boardRepo from "../repositories/board.repository.js";
 import * as memberRepo from "../repositories/member.repository.js";
 import * as auditRepo from "../repositories/auditLog.repository.js";
 import { AppError } from "../utils/appError.js";
-import { Role, ENTITY_TYPE, ACTION } from "../prisma/generated/prisma/enums.js";
-import { CreateBoardInput, UpdateBoardInput } from "../dtos/board.dto.js";
+import { ROLE, ENTITY_TYPE, ACTION } from "../prisma/generated/prisma/enums.js";
+import { UpdateBoardInput } from "../dtos/board.dto.js";
 
 export const getBoards = async ({ name }: { name: string }) => {
   return boardRepo.findBoardsByName({ name });
@@ -22,7 +22,7 @@ export const createBoard = async ({
   if (exist.length > 0) throw new AppError("Board already exists", 400);
 
   const member = await memberRepo.findMember({ userId, workspaceId });
-  if (!member || member.role === Role.MEMBER)
+  if (!member || member.role === ROLE.MEMBER)
     throw new AppError("Not authorized", 403);
 
   const board = await boardRepo.createBoard({ title, workspaceId });
@@ -54,7 +54,7 @@ export const updateBoardService = async ({
     userId,
     workspaceId: board.workspaceId,
   });
-  if (!member || member.role === Role.MEMBER)
+  if (!member || member.role === ROLE.MEMBER)
     throw new AppError("Not authorized", 403);
 
   const updated = await boardRepo.updateBoard(id, {
@@ -90,7 +90,7 @@ export const trashBoard = async ({
     userId,
     workspaceId: board.workspaceId,
   });
-  if (!member || member.role === Role.MEMBER)
+  if (!member || member.role === ROLE.MEMBER)
     throw new AppError("Not authorized", 403);
 
   await boardRepo.updateBoardTrash({ boardId, trash: true });
@@ -121,7 +121,7 @@ export const restoreBoard = async ({
     userId,
     workspaceId: board.workspaceId,
   });
-  if (!member || member.role === Role.MEMBER)
+  if (!member || member.role === ROLE.MEMBER)
     throw new AppError("Not authorized", 403);
 
   await boardRepo.updateBoardTrash({ boardId, trash: false });
@@ -152,7 +152,7 @@ export const deleteBoardService = async ({
     userId,
     workspaceId: board.workspaceId,
   });
-  if (!member || member.role === Role.MEMBER)
+  if (!member || member.role === ROLE.MEMBER)
     throw new AppError("Not authorized", 403);
 
   await boardRepo.deleteBoardById({ boardId });

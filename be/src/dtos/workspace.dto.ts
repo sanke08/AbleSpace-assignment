@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Role } from "../prisma/generated/prisma/enums";
+import { ROLE } from "../prisma/generated/prisma/enums.js";
 
 export const createWorkspaceSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name too long"),
@@ -10,7 +10,7 @@ export const updateWorkspaceSchema = z.object({
 });
 
 export const updateMemberRoleSchema = z.object({
-  role: z.nativeEnum(Role),
+  role: z.nativeEnum(ROLE),
 });
 
 export const joinWorkspaceSchema = z.object({

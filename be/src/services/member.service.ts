@@ -1,7 +1,7 @@
 import * as memberRepository from "../repositories/member.repository.js";
 import * as auditLogRepository from "../repositories/auditLog.repository.js";
 import { AppError } from "../utils/appError.js";
-import { ACTION, ENTITY_TYPE, Role } from "../prisma/generated/prisma/enums.js";
+import { ACTION, ENTITY_TYPE, ROLE } from "../prisma/generated/prisma/enums.js";
 
 import * as workspaceRepository from "../repositories/workspace.repository.js";
 
@@ -16,7 +16,7 @@ export const addMember = async ({
   const member = await memberRepository.addMember({
     workspaceId,
     userId,
-    role: Role.MEMBER,
+    role: ROLE.MEMBER,
   });
   return member;
 };
@@ -45,7 +45,7 @@ export const joinWorkspace = async ({
   const member = await memberRepository.addMember({
     workspaceId,
     userId,
-    role: Role.MEMBER,
+    role: ROLE.MEMBER,
   });
 
   // Log activity
@@ -81,7 +81,7 @@ export const removeMember = async ({
     workspaceId,
     userId: actorId,
   });
-  if (!actor || actor.role !== Role.ADMIN) {
+  if (!actor || actor.role !== ROLE.ADMIN) {
     throw new AppError("Not authorized", 403);
   }
 
@@ -116,7 +116,7 @@ export const updateRole = async ({
   actorId: string;
   workspaceId: string;
   targetMemberId: string;
-  newRole: Role;
+  newRole: ROLE;
 }) => {
   const workspace = await workspaceRepository.findWorkspaceById({
     id: workspaceId,
@@ -127,7 +127,7 @@ export const updateRole = async ({
     workspaceId,
     userId: actorId,
   });
-  if (!actor || actor.role !== Role.ADMIN)
+  if (!actor || actor.role !== ROLE.ADMIN)
     throw new AppError("Not authorized", 403);
 
   const member = await memberRepository.updateMemberRole({

@@ -55,6 +55,54 @@ export const remove = catchAsync(async (req, res) => {
   await listService.deleteList({
     userId: req.user.id,
     listId: validation.data.listId,
+    workspaceId: validation.data.workspaceId,
+    boardId: validation.data.boardId,
   });
+  res.status(204).send();
+});
+
+export const createList = catchAsync(async (req, res) => {
+  const { title } = req.body;
+  const { boardId } = req.params;
+  if (!boardId) throw new AppError("Board ID is required", 400);
+
+  const list = await listService.createList({
+    title,
+    boardId,
+    userId: req.user.id,
+  });
+
+  res.status(201).json({ status: "success", data: list });
+});
+
+export const updateList = catchAsync(async (req, res) => {
+  const { title } = req.body;
+  const { boardId, listId, workspaceId } = req.params;
+  if (!boardId || !listId || !workspaceId)
+    throw new AppError("Board ID, List ID and Workspace ID are required", 400);
+
+  const list = await listService.updateList({
+    title,
+    boardId,
+    listId,
+    userId: req.user.id,
+    workspaceId,
+  });
+
+  res.status(200).json({ status: "success", data: list });
+});
+
+export const deleteList = catchAsync(async (req, res) => {
+  const { boardId, listId, workspaceId } = req.params;
+  if (!boardId || !listId || !workspaceId)
+    throw new AppError("Board ID, List ID and Workspace ID are required", 400);
+
+  await listService.deleteList({
+    boardId,
+    listId,
+    userId: req.user.id,
+    workspaceId,
+  });
+
   res.status(204).send();
 });

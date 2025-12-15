@@ -27,7 +27,7 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
-enum Role {
+enum ROLE {
   ADMIN
   MEMBER
 }
@@ -41,7 +41,7 @@ model Member {
   user      User      @relation(fields: [userId], references: [id])
   workspace Workspace @relation(fields: [workspaceId], references: [id])
 
-  role Role @default(MEMBER)
+  role ROLE @default(MEMBER)
 
   taskAssigned   Task[] @relation("TaskAssignee")
   taskAssignedBy Task[] @relation("TaskAssignedBy")
@@ -136,7 +136,7 @@ model Task {
 enum ENTITY_TYPE {
   BOARD
   LIST
-  CARD
+  TASK
   MEMBER
 }
 

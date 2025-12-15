@@ -2,9 +2,11 @@ import * as listRepo from "../repositories/list.repository.js";
 import * as memberRepo from "../repositories/member.repository.js";
 import * as auditRepo from "../repositories/auditLog.repository.js";
 import { AppError } from "../utils/appError.js";
-import { Role } from "../prisma/generated/prisma/enums.js";
+import { ROLE } from "../prisma/generated/prisma/enums.js";
 import { ENTITY_TYPE, ACTION } from "../prisma/generated/prisma/enums.js";
 import { CopyListInput } from "../dtos/list.dto.js";
+import { db } from "../utils/db.js";
+import { io } from "../server.js";
 
 export const copyList = async ({
   userId,
@@ -63,7 +65,7 @@ export const trashList = async ({
     userId,
     workspaceId: list.board.workspaceId,
   });
-  if (!member || member.role === Role.MEMBER)
+  if (!member || member.role === ROLE.MEMBER)
     throw new AppError("Not authorized", 403);
 
   await listRepo.updateListTrash({ listId, trash: true });
@@ -83,7 +85,7 @@ export const restoreList = async ({
     userId,
     workspaceId: list.board.workspaceId,
   });
-  if (!member || member.role === Role.MEMBER)
+  if (!member || member.role === ROLE.MEMBER)
     throw new AppError("Not authorized", 403);
 
   await listRepo.updateListTrash({ listId, trash: false });
@@ -100,22 +102,142 @@ export const restoreList = async ({
   });
 };
 
-export const deleteList = async ({
+// export const deleteList = async ({
+//   userId,
+//   listId,
+// }: {
+//   userId: string;
+//   listId: string;
+// }) => {
+//   const list = await listRepo.findListByIdWithWorkspace({ listId });
+//   if (!list) throw new AppError("List not found", 404);
+
+//   const member = await memberRepo.findMember({
+//     userId,
+//     workspaceId: list.board.workspaceId,
+//   });
+//   if (!member || member.role === ROLE.MEMBER)
+//     throw new AppError("Not authorized", 403);
+
+//   await listRepo.deleteListById({ listId });
+// };
+
+export const createList = async ({
+  title,
+  boardId,
   userId,
-  listId,
 }: {
+  title: string;
+  boardId: string;
   userId: string;
-  listId: string;
 }) => {
-  const list = await listRepo.findListByIdWithWorkspace({ listId });
+  const board = await db.board.findUnique({ where: { id: boardId } });
+  if (!board) throw new AppError("Board not found", 404);
+
+  const list = await db.list.create({
+    data: {
+      title,
+      boardId,
+    },
+  });
+
+  io.to(`board:${boardId}`).emit("list:created", list);
+
+  await db.auditLog.create({
+    data: {
+      workspaceId: board.workspaceId,
+      entityId: list.id,
+      entityType: ENTITY_TYPE.LIST,
+      entityTitle: list.title,
+      action: ACTION.CREATE,
+      userId,
+      userName: "snapshot", // fetch once if needed
+      userImage: "",
+    },
+  });
+
+  return list;
+};
+
+export const updateList = async ({
+  title,
+  boardId,
+  listId,
+  userId,
+  workspaceId,
+}: {
+  title: string;
+  boardId: string;
+  listId: string;
+  userId: string;
+  workspaceId: string;
+}) => {
+  const list = await db.list.findUnique({ where: { id: listId } });
   if (!list) throw new AppError("List not found", 404);
 
-  const member = await memberRepo.findMember({
-    userId,
-    workspaceId: list.board.workspaceId,
+  const updated = await db.list.update({
+    where: { id: listId },
+    data: { title },
   });
-  if (!member || member.role === Role.MEMBER)
-    throw new AppError("Not authorized", 403);
 
-  await listRepo.deleteListById({ listId });
+  io.to(`board:${boardId}`).emit("list:updated", updated);
+
+  await db.auditLog.create({
+    data: {
+      workspaceId,
+      entityId: list.id,
+      entityType: ENTITY_TYPE.LIST,
+      entityTitle: updated.title,
+      action: ACTION.UPDATE,
+      userId,
+      userName: "snapshot",
+      userImage: "",
+    },
+  });
+
+  return updated;
+};
+
+export const deleteList = async ({
+  boardId,
+  listId,
+  userId,
+  workspaceId,
+}: {
+  boardId: string;
+  listId: string;
+  userId: string;
+  workspaceId: string;
+}) => {
+  const list = await db.list.findUnique({ where: { id: listId } });
+  if (!list) throw new AppError("List not found", 404);
+
+  const deleted = await db.list.update({
+    where: { id: listId },
+    data: { trash: true },
+  });
+
+  io.to(`board:${boardId}`).emit("list:deleted", deleted);
+
+  // await db.auditLog.create({
+  //   data: {
+  //     entityId: list.id,
+  //     entityType: ENTITY_TYPE.LIST,
+  //     entityTitle: list.title,
+  //     action: ACTION.DELETE,
+  //     userId,
+  //     userName: "snapshot",
+  //     userImage: "",
+  //   },
+  // });
+  await auditRepo.createAuditLog({
+    workspaceId,
+    entityId: list.id,
+    entityType: ENTITY_TYPE.LIST,
+    entityTitle: list.title,
+    userId,
+    userName: "snapshot",
+    userImage: "",
+    action: ACTION.DELETE,
+  });
 };

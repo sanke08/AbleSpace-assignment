@@ -5,7 +5,7 @@ import {
   type UpdateWorkspaceInput,
 } from "../dtos/workspace.dto.js";
 import { AppError } from "../utils/appError.js";
-import { Role } from "../prisma/generated/prisma/enums.js";
+import { ROLE } from "../prisma/generated/prisma/enums.js";
 
 export const createWorkspace = async ({
   userId,
@@ -29,7 +29,7 @@ export const createWorkspace = async ({
   await memberRepository.addMember({
     workspaceId: workspace.id,
     userId,
-    role: Role.ADMIN,
+    role: ROLE.ADMIN,
   });
 
   return workspace;
@@ -50,7 +50,7 @@ export const updateWorkspace = async ({
 }) => {
   // Check if user is admin or member (logic from nextjs wasn't strict on role for update, but assuming Admin)
   const member = await memberRepository.findMember({ workspaceId, userId });
-  if (!member || member.role !== Role.ADMIN) {
+  if (!member || member.role !== ROLE.ADMIN) {
     throw new AppError("Not authorized to update workspace", 403);
   }
 
@@ -65,7 +65,7 @@ export const deleteWorkspace = async ({
   userId: string;
 }) => {
   const member = await memberRepository.findMember({ workspaceId, userId });
-  if (!member || member.role !== Role.ADMIN) {
+  if (!member || member.role !== ROLE.ADMIN) {
     throw new AppError("Not authorized", 403);
   }
   return await workspaceRepository.deleteWorkspace({ id: workspaceId });
