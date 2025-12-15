@@ -2,7 +2,6 @@ import { z } from "zod";
 
 export const createBoardSchema = z.object({
   title: z.string().min(1),
-  workspaceId: z.string().uuid(),
 });
 
 export const updateBoardSchema = z.object({

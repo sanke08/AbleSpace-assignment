@@ -23,14 +23,19 @@ export const getBoards = catchAsync(async (req, res) => {
 });
 
 export const createBoard = catchAsync(async (req, res) => {
+  const { workspaceId } = req.params as { workspaceId: string };
+  if (!workspaceId) throw new AppError("Workspace ID is required", 400);
+
   const validation = createBoardSchema.safeParse(req.body);
+
   if (!validation.success) {
     const message = validation.error?.issues[0]?.message || "Validation error";
     throw new AppError(message, 400);
   }
   const board = await boardService.createBoard({
     userId: req.user.id,
-    ...validation.data,
+    title: validation.data.title,
+    workspaceId,
   });
   res.status(201).json({ status: "success", data: board });
 });

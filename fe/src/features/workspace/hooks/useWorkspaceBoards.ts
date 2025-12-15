@@ -1,4 +1,4 @@
-import { api } from "@/lib/axios";
+import { fetchWorkspaceBoards } from "@/features/boards/api/boards.api";
 import type { Board } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 
@@ -12,10 +12,7 @@ export const useWorkspaceBoards = (workspaceId?: string) => {
   return useQuery<WorkspaceBoardsResponse>({
     queryKey: ["workspace-boards", workspaceId],
     enabled: !!workspaceId, // 🚨 IMPORTANT
-    queryFn: async () => {
-      const { data } = await api.get(`/workspaces/${workspaceId}/boards`);
-      return data.data;
-    },
+    queryFn: () => fetchWorkspaceBoards(workspaceId!),
     staleTime: 1000 * 60 * 5,
   });
 };

@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { useWorkspaceBoards } from "../hooks/useWorkspaceBoards";
 import { Building } from "lucide-react";
 import BoardList from "../components/BoardList";
+import AddBoardDialog from "@/features/boards/components/AddBoard";
 
 const WorkspacePage = () => {
   const { workspaceId } = useParams<{ workspaceId: string }>();
@@ -18,7 +19,7 @@ const WorkspacePage = () => {
   if (!workspace) return <div>Workspace not found</div>;
 
   return (
-    <div className="w-full bg-red-300">
+    <div className="w-full">
       <div className="w-fit flex gap-2 px-5">
         <Building />
         <p className=" font-semibold text-lg">{workspace.name} </p>
@@ -26,7 +27,7 @@ const WorkspacePage = () => {
       <div className="w-full h-[0.1rem] rounded-full mt-3 bg-neutral-900/10" />
       <div className="grid justify-center w-full md:grid-cols-3 min-[412px]:grid-cols-2 sm:p-0 px-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 lg:px-10 min-[412px]:gap-3 mt-5">
         <BoardList boards={workspace.boards} workspaceId={workspace.id} />
-        {/* <CreateBoard member={member} /> */}
+        <AddBoardDialog workspaceId={workspace.id} />
       </div>
     </div>
   );

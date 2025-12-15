@@ -30,8 +30,7 @@ export const createBoard = async ({
   if (exist.length > 0) throw new AppError("Board already exists", 400);
 
   const member = await memberRepo.findMember({ userId, workspaceId });
-  if (!member || member.role === ROLE.MEMBER)
-    throw new AppError("Not authorized", 403);
+  if (!member) throw new AppError("Not authorized", 403);
 
   const board = await boardRepo.createBoard({ title, workspaceId });
 
