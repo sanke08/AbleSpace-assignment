@@ -38,11 +38,36 @@ export const createListCopy = ({
   });
 };
 
-export const findListByIdWithWorkspace = ({ listId }: { listId: string }) => {
+export const findList = ({
+  listId,
+  boardId,
+  workspaceId,
+  userId,
+}: {
+  listId: string;
+  boardId: string;
+  workspaceId: string;
+  userId: string;
+}) => {
   return db.list.findUnique({
-    where: { id: listId },
+    where: {
+      id: listId,
+      boardId,
+      board: { workspaceId, workspace: { members: { some: { userId } } } },
+    },
     include: {
-      board: { include: { workspace: true } },
+      board: {
+        include: {
+          workspace: {
+            include: {
+              members: {
+                where: { userId },
+                select: { user: { select: { name: true, avatar: true } } },
+              },
+            },
+          },
+        },
+      },
     },
   });
 };

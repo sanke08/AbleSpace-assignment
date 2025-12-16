@@ -11,7 +11,7 @@ const App = () => {
         <Route index element={<WorkspacePage />} />
         <Route path="boards/:boardId" element={<BoardPage />} />
       </Route>
-      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/" element={<AuthPage />} />
     </Routes>
   );
 };

@@ -27,6 +27,8 @@ export const trash = catchAsync(async (req, res) => {
   await listService.trashList({
     userId: req.user.id,
     listId: validation.data.listId,
+    boardId: validation.data.boardId,
+    workspaceId: validation.data.workspaceId,
   });
   res.status(200).json({ status: "success" });
 });
@@ -41,6 +43,8 @@ export const restore = catchAsync(async (req, res) => {
   await listService.restoreList({
     userId: req.user.id,
     listId: validation.data.listId,
+    boardId: validation.data.boardId,
+    workspaceId: validation.data.workspaceId,
   });
   res.status(200).json({ status: "success" });
 });

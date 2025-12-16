@@ -54,39 +54,66 @@ export const copyList = async ({
 export const trashList = async ({
   userId,
   listId,
+  boardId,
+  workspaceId,
 }: {
   userId: string;
   listId: string;
+  boardId: string;
+  workspaceId: string;
 }) => {
-  const list = await listRepo.findListByIdWithWorkspace({ listId });
+  const list = await listRepo.findList({
+    listId,
+    boardId,
+    workspaceId,
+    userId,
+  });
   if (!list) throw new AppError("List not found", 404);
 
-  const member = await memberRepo.findMember({
-    userId,
-    workspaceId: list.board.workspaceId,
-  });
-  if (!member || member.role === ROLE.MEMBER)
-    throw new AppError("Not authorized", 403);
+  console.log({ list });
 
-  await listRepo.updateListTrash({ listId, trash: true });
+  const updated = await listRepo.updateListTrash({ listId, trash: true });
+  console.log({ updated });
+  io.to(`board:${boardId}`).emit("list:trashed", list);
+
+  db.auditLog
+    .create({
+      data: {
+        workspaceId: list.board.workspaceId,
+        entityId: list.id,
+        entityType: ENTITY_TYPE.LIST,
+        entityTitle: list.title,
+        action: ACTION.TRASHED,
+        userId,
+        userName: list.board.workspace.members[0]?.user.name || "", // fetch once if needed
+        userImage: list.board.workspace.members[0]?.user.avatar || "",
+      },
+    })
+    .catch((error) => {
+      // Log the error but don't block the response
+      console.error("Failed to create audit log:", error);
+      // Optionally: send to error tracking service
+    });
 };
 
 export const restoreList = async ({
   userId,
   listId,
+  boardId,
+  workspaceId,
 }: {
   userId: string;
   listId: string;
+  boardId: string;
+  workspaceId: string;
 }) => {
-  const list = await listRepo.findListByIdWithWorkspace({ listId });
-  if (!list) throw new AppError("List not found", 404);
-
-  const member = await memberRepo.findMember({
+  const list = await listRepo.findList({
+    listId,
+    boardId,
     userId,
-    workspaceId: list.board.workspaceId,
+    workspaceId,
   });
-  if (!member || member.role === ROLE.MEMBER)
-    throw new AppError("Not authorized", 403);
+  if (!list) throw new AppError("List not found", 404);
 
   await listRepo.updateListTrash({ listId, trash: false });
 
@@ -96,8 +123,8 @@ export const restoreList = async ({
     entityType: ENTITY_TYPE.LIST,
     entityTitle: list.title,
     userId,
-    userName: member.user.name,
-    userImage: member.user.avatar || "",
+    userName: list.board.workspace.members[0]?.user.name!,
+    userImage: list.board.workspace.members[0]?.user.avatar || "",
     action: ACTION.RESTORED,
   });
 };
@@ -143,18 +170,24 @@ export const createList = async ({
 
   io.to(`board:${boardId}`).emit("list:created", list);
 
-  await db.auditLog.create({
-    data: {
-      workspaceId: board.workspaceId,
-      entityId: list.id,
-      entityType: ENTITY_TYPE.LIST,
-      entityTitle: list.title,
-      action: ACTION.CREATE,
-      userId,
-      userName: "snapshot", // fetch once if needed
-      userImage: "",
-    },
-  });
+  db.auditLog
+    .create({
+      data: {
+        workspaceId: board.workspaceId,
+        entityId: list.id,
+        entityType: ENTITY_TYPE.LIST,
+        entityTitle: list.title,
+        action: ACTION.CREATE,
+        userId,
+        userName: "snapshot", // fetch once if needed
+        userImage: "",
+      },
+    })
+    .catch((error) => {
+      // Log the error but don't block the response
+      console.error("Failed to create audit log:", error);
+      // Optionally: send to error tracking service
+    });
 
   return list;
 };
@@ -172,11 +205,11 @@ export const updateList = async ({
   userId: string;
   workspaceId: string;
 }) => {
-  const list = await db.list.findUnique({ where: { id: listId } });
+  const list = await db.list.findUnique({ where: { id: listId, boardId } });
   if (!list) throw new AppError("List not found", 404);
 
   const updated = await db.list.update({
-    where: { id: listId },
+    where: { id: listId, boardId },
     data: { title },
   });
 

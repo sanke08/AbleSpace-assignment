@@ -1,16 +1,15 @@
 import { z } from "zod";
 
 export const copyListSchema = z.object({
-  listId: z.uuid(),
-  boardId: z.uuid(),
-  workspaceId: z.uuid(), // was orgId before
+  listId: z.cuid(),
+  boardId: z.cuid(),
+  workspaceId: z.cuid(), // was orgId before
 });
 
 export const listIdSchema = z.object({
-  listId: z.uuid(),
-  workspaceId: z.uuid(),
-  boardId: z.uuid(),
-  userId: z.uuid(),
+  listId: z.cuid(),
+  workspaceId: z.cuid(),
+  boardId: z.cuid(),
 });
 
 export type CopyListInput = z.infer<typeof copyListSchema>;

@@ -2,7 +2,7 @@ import * as taskController from "../controllers/task.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
 import { Router } from "express";
 
-const router: Router = Router({ mergeParams: true });
+const router: Router = Router();
 
 router.use(protect);
 

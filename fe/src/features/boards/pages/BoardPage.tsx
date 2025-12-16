@@ -2,6 +2,7 @@ import { Loader } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { useBoard } from "../hooks/useBoard";
 import BoardHeader from "../components/BoardHeader";
+import ListContainer from "../components/ListContainer";
 
 const BoardPage = () => {
   const { workspaceId, boardId } = useParams<{
@@ -18,8 +19,13 @@ const BoardPage = () => {
   if (!data) return <p>Board not found</p>;
 
   return (
-    <div className="space-y-4 h-[200vh]">
+    <div className="space-y-4">
       <BoardHeader board={data.board} member={data.member} />
+      <ListContainer
+        lists={data.board.lists}
+        workspaceId={workspaceId!}
+        boardId={boardId!}
+      />
     </div>
   );
 };

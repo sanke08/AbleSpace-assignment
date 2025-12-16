@@ -54,11 +54,11 @@ const NavItem = ({ workspace, user }: Props) => {
   ];
 
   return (
-    <AccordionItem value={workspace.id}>
+    <AccordionItem value={workspace.id} className="space-y-1">
       <AccordionTrigger
         onClick={() => setToggle((pre) => !pre)}
         className={twMerge(
-          "border border-neutral-600/30 mt-1 hover:no-underline p-2 px-4 rounded",
+          "border border-neutral-300 hover:no-underline p-2 px-4 rounded-md",
           params?.workspaceId === workspace.id && "bg-sky-200/50",
           toggle && params?.workspaceId === workspace.id && "bg-white"
         )}
@@ -94,7 +94,6 @@ const NavItem = ({ workspace, user }: Props) => {
             {route.label}
           </Button>
         ))}
-        <p className="h-px w-full bg-neutral-500/30 rounded-full" />
       </AccordionContent>
     </AccordionItem>
   );

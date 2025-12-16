@@ -15,7 +15,6 @@ export const Navbar = ({}: Props) => {
       <div className="px-20 h-14 flex items-center justify-between">
         <div className="gap-3 items-center hidden md:flex">
           <div className="font-semibold">Taskify</div>
-          <Button>Create</Button>
         </div>
 
         <div className="flex gap-2 items-center md:hidden z-50">

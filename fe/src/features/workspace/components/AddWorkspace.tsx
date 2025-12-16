@@ -41,9 +41,11 @@ const AddWorkspace = () => {
 
   return (
     <Dialog>
-      <DialogTrigger className="flex items-center gap-2 p-2 px-4 border w-full rounded">
-        <Plus />
-        <p>Add Workspace</p>
+      <DialogTrigger asChild>
+        <Button className=" w-full">
+          <Plus />
+          <p>Add Workspace</p>
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

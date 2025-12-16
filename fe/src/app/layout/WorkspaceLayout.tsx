@@ -30,11 +30,11 @@ export default function WorkspaceLayout() {
   }
 
   return (
-    <div className="min-h-screen px-24">
+    <div className="px-24">
       <Toaster />
       <Navbar workspaces={workspaces} user={user as User} />
-      <div className="pt-14 mt-2 flex gap-10">
-        <div className=" min-w-60 max-w-60 w-60 sticky top-16 self-start">
+      <div className="pt-14 mt-4 flex gap-10">
+        <div className=" min-w-60 max-w-60 w-60 sticky top-20 self-start border-r border-neutral-300 pr-2">
           <Sidebar workspaces={workspaces} user={user as User} />
         </div>
         <div className="mt-2 w-full">
