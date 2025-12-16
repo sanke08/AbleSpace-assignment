@@ -89,7 +89,15 @@ import {
 import { useAddTask } from "../hooks/useAddTask";
 import { createTaskSchema, type CreateTaskInput } from "../schema/task.schema";
 
-const AddTask = ({ listId }: { listId: string }) => {
+const AddTask = ({
+  listId,
+  boardId,
+  workspaceId,
+}: {
+  listId: string;
+  boardId: string;
+  workspaceId: string;
+}) => {
   const [open, setOpen] = useState(false);
 
   const { mutateAsync, isPending } = useAddTask();
@@ -98,13 +106,12 @@ const AddTask = ({ listId }: { listId: string }) => {
     resolver: zodResolver(createTaskSchema),
     defaultValues: {
       title: "",
-      listId,
     },
   });
 
   const onSubmit = async (values: CreateTaskInput) => {
     try {
-      await mutateAsync(values);
+      await mutateAsync({ boardId, listId, workspaceId, title: values.title });
       form.reset();
       setOpen(false);
     } catch (error) {

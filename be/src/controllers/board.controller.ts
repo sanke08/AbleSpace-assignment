@@ -12,15 +12,17 @@ import { AppError } from "../utils/appError.js";
 export const getBoards = catchAsync(async (req, res) => {
   const { workspaceId } = req.params as { workspaceId: string };
   if (!workspaceId) throw new AppError("Workspace ID is required", 400);
-  const workspace = await workspaceService.getWorkspaceById({
-    userId: req.user.id,
+  // const workspace = await workspaceService.getWorkspaceById({
+  //   userId: req.user.id,
+  //   workspaceId,
+  // });
+  // if (!workspace) throw new AppError("Workspace not found", 404);
+  const workspace = await boardService.getBoardsByWorkspaceId({
     workspaceId,
   });
   if (!workspace) throw new AppError("Workspace not found", 404);
-  const boards = await boardService.getBoardsByWorkspaceId({
-    workspaceId: workspace.id,
-  });
-  res.status(200).json({ status: "success", data: boards });
+
+  res.status(200).json({ status: "success", data: workspace });
 });
 
 export const createBoard = catchAsync(async (req, res) => {
@@ -108,7 +110,8 @@ export const getBoardDetails = catchAsync(async (req, res) => {
     throw new AppError(message, 400);
   }
   const board = await boardService.getBoardsDetails({
-    ...validation.data,
+    boardId: validation.data.boardId,
+    workspaceId: validation.data.workspaceId,
     userId: req.user.id,
   });
   const { workspace, ...rest } = board;

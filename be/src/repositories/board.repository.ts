@@ -95,7 +95,10 @@ export const getBoardDetail = ({
   return db.board.findUnique({
     where: { id: boardId, workspaceId },
     include: {
-      lists: { where: { trash: false } },
+      lists: {
+        where: { trash: false },
+        include: { tasks: { select: { id: true, title: true } } },
+      },
       workspace: {
         select: {
           members: { where: { userId: userId } },

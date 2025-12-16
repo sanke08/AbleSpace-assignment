@@ -5,15 +5,19 @@ import { AppError } from "../utils/appError.js";
 
 export const createTask = catchAsync(async (req: Request, res: Response) => {
   const { title } = req.body;
-  const { listId, boardId } = req.params;
+  const { listId, boardId, workspaceId } = req.params;
 
-  if (!title || !listId || !boardId)
-    throw new AppError("Title, listId, and boardId are required", 400);
+  if (!title || !listId || !boardId || !workspaceId)
+    throw new AppError(
+      "Title, listId, boardId, and workspaceId are required",
+      400
+    );
 
   const task = await taskService.createTask({
     title,
     listId,
     boardId,
+    workspaceId,
     userId: req.user.id,
   });
 

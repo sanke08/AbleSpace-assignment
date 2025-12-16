@@ -2,24 +2,26 @@ import { db } from "../utils/db.js";
 import { AppError } from "../utils/appError.js";
 import { ACTION, ENTITY_TYPE, ROLE } from "../prisma/generated/prisma/enums.js";
 import { io } from "../server.js";
+import { findList } from "../repositories/list.repository.js";
 
 export const createTask = async ({
   title,
   listId,
   boardId,
   userId,
+  workspaceId,
 }: {
   title: string;
   listId: string;
   boardId: string;
   userId: string;
+  workspaceId: string;
 }) => {
-  const list = await db.list.findUnique({
-    where: { id: listId },
-    include: { board: true },
-  });
+  const list = await findList({ boardId, listId, userId, workspaceId });
 
   if (!list) throw new AppError("List not found", 404);
+
+  if (list.trash) throw new AppError("List is trashed", 400);
 
   const task = await db.task.create({
     data: {
@@ -30,18 +32,23 @@ export const createTask = async ({
 
   io.to(`board:${boardId}`).emit("task:created", task);
 
-  await db.auditLog.create({
-    data: {
-      workspaceId: list.board.workspaceId,
-      entityId: task.id,
-      entityType: ENTITY_TYPE.TASK,
-      entityTitle: task.title,
-      action: ACTION.CREATE,
-      userId,
-      userName: "snapshot",
-      userImage: "",
-    },
-  });
+  db.auditLog
+    .create({
+      data: {
+        workspaceId: list.board.workspaceId,
+        entityId: task.id,
+        entityType: ENTITY_TYPE.TASK,
+        entityTitle: task.title,
+        action: ACTION.CREATE,
+        userId,
+        userName: list.board.workspace.members[0]?.user.name || "",
+        userImage: list.board.workspace.members[0]?.user.avatar || "",
+      },
+    })
+    .catch((err) => {
+      console.log(err);
+      // Do further processing
+    });
 
   return task;
 };

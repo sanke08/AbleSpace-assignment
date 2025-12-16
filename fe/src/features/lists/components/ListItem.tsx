@@ -6,6 +6,7 @@ import type { List } from "@/lib/types";
 import { useTaskSocket } from "@/features/tasks/hooks/useTaskSocket";
 import AddTask from "@/features/tasks/components/AddTask";
 import ListHeader from "./ListHeader";
+import TaskCard from "@/features/tasks/components/TaskCard";
 
 type Props = {
   list: List;
@@ -13,7 +14,7 @@ type Props = {
 };
 
 const ListItem = ({ list, workspaceId }: Props) => {
-  const [tasks, setTasks] = useState(list.tasks);
+  const [tasks, setTasks] = useState(list.tasks || []);
   const [searchParams] = useSearchParams();
 
   useTaskSocket({
@@ -40,12 +41,22 @@ const ListItem = ({ list, workspaceId }: Props) => {
       <ListHeader list={list} workspaceId={workspaceId} />
 
       <ol className="flex flex-col space-y-2 mt-2">
-        {/* {tasks.map((task, index) => (
-          <TaskItem key={task.id} task={task} index={index} />
-        ))} */}
+        {tasks.map((task, index) => (
+          <TaskCard
+            key={task.id}
+            task={task}
+            index={index}
+            boardId={list.boardId}
+            workspaceId={workspaceId}
+          />
+        ))}
       </ol>
 
-      <AddTask listId={list.id} />
+      <AddTask
+        listId={list.id}
+        boardId={list.boardId}
+        workspaceId={workspaceId}
+      />
     </li>
   );
 };
