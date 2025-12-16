@@ -3,7 +3,7 @@ import { api } from "@/lib/axios";
 
 export const useWorkspaceMembers = () => {
   return useQuery({
-    queryKey: ["workspace-members"],
+    queryKey: ["workspaces"],
     queryFn: async () => {
       const { data } = await api.get("/workspaces");
       return data.data;

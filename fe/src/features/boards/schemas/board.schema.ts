@@ -5,3 +5,7 @@ export const createBoardSchema = z.object({
 });
 
 export type CreateBoardInput = z.infer<typeof createBoardSchema>;
+
+export const updateBoardSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+});

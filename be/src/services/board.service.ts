@@ -53,8 +53,9 @@ export const updateBoardService = async ({
   id,
   title,
   imageUrl,
-}: UpdateBoardInput & { userId: string }) => {
-  const board = await boardRepo.findBoardById({ boardId: id });
+  workspaceId,
+}: UpdateBoardInput & { userId: string; workspaceId: string }) => {
+  const board = await boardRepo.findBoardById({ boardId: id, workspaceId });
   if (!board) throw new AppError("Board not found", 404);
 
   const member = await memberRepo.findMember({
@@ -86,11 +87,13 @@ export const updateBoardService = async ({
 export const trashBoard = async ({
   userId,
   boardId,
+  workspaceId,
 }: {
   userId: string;
   boardId: string;
+  workspaceId: string;
 }) => {
-  const board = await boardRepo.findBoardById({ boardId });
+  const board = await boardRepo.findBoardById({ boardId, workspaceId });
   if (!board) throw new AppError("Board not found", 404);
 
   const member = await memberRepo.findMember({
@@ -117,11 +120,13 @@ export const trashBoard = async ({
 export const restoreBoard = async ({
   userId,
   boardId,
+  workspaceId,
 }: {
   userId: string;
   boardId: string;
+  workspaceId: string;
 }) => {
-  const board = await boardRepo.findBoardById({ boardId });
+  const board = await boardRepo.findBoardById({ boardId, workspaceId });
   if (!board) throw new AppError("Board not found", 404);
 
   const member = await memberRepo.findMember({
@@ -148,11 +153,13 @@ export const restoreBoard = async ({
 export const deleteBoardService = async ({
   userId,
   boardId,
+  workspaceId,
 }: {
   userId: string;
   boardId: string;
+  workspaceId: string;
 }) => {
-  const board = await boardRepo.findBoardById({ boardId });
+  const board = await boardRepo.findBoardById({ boardId, workspaceId });
   if (!board) throw new AppError("Board not found", 404);
 
   const member = await memberRepo.findMember({
@@ -174,4 +181,25 @@ export const deleteBoardService = async ({
     userName: member.user.name,
     userImage: member.user.avatar || "",
   });
+};
+
+export const getBoardsDetails = async ({
+  userId,
+  workspaceId,
+  boardId,
+}: {
+  userId: string;
+  workspaceId: string;
+  boardId: string;
+}) => {
+  const board = await boardRepo.getBoardDetail({
+    boardId,
+    workspaceId,
+    userId,
+  });
+  if (!board) throw new AppError("Board not found", 404);
+  // const member = await memberRepo.findMember({ userId, workspaceId });
+  // if (!member || member.role === ROLE.MEMBER)
+  // throw new AppError("Not authorized", 403);
+  return board;
 };

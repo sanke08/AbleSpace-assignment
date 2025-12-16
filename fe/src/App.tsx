@@ -1,13 +1,15 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import AuthPage from "@/features/auth/pages/AuthPage";
 import WorkspaceLayout from "./app/layout/WorkspaceLayout";
 import WorkspacePage from "./features/workspace/pages/WorkspacePage";
+import BoardPage from "./features/boards/pages/BoardPage";
 
 const App = () => {
   return (
     <Routes>
-      <Route path="/" element={<WorkspaceLayout />}>
-        <Route path="/:workspaceId" element={<WorkspacePage />} />
+      <Route path="/:workspaceId" element={<WorkspaceLayout />}>
+        <Route index element={<WorkspacePage />} />
+        <Route path="boards/:boardId" element={<BoardPage />} />
       </Route>
       <Route path="/auth" element={<AuthPage />} />
     </Routes>

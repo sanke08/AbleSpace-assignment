@@ -38,7 +38,7 @@ const AddBoardDialog = ({ workspaceId }: Props) => {
 
   return (
     <Dialog>
-      <DialogTrigger className="border rounded-lg shadow cursor-pointer">
+      <DialogTrigger className="border rounded-lg shadow h-20 cursor-pointer">
         <Plus className="mx-auto" />
         Add Board
       </DialogTrigger>

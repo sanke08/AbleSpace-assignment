@@ -3,6 +3,7 @@ import { useWorkspaceBoards } from "../hooks/useWorkspaceBoards";
 import { Building } from "lucide-react";
 import BoardList from "../components/BoardList";
 import AddBoardDialog from "@/features/boards/components/AddBoard";
+import { Separator } from "@/components/ui/separator";
 
 const WorkspacePage = () => {
   const { workspaceId } = useParams<{ workspaceId: string }>();
@@ -24,8 +25,8 @@ const WorkspacePage = () => {
         <Building />
         <p className=" font-semibold text-lg">{workspace.name} </p>
       </div>
-      <div className="w-full h-[0.1rem] rounded-full mt-3 bg-neutral-900/10" />
-      <div className="grid justify-center w-full md:grid-cols-3 min-[412px]:grid-cols-2 sm:p-0 px-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 lg:px-10 min-[412px]:gap-3 mt-5">
+      <Separator />
+      <div className="grid justify-center w-full md:grid-cols-3 min-[412px]:grid-cols-2 sm:p-0 px-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 lg:px-0 min-[412px]:gap-3 mt-5">
         <BoardList boards={workspace.boards} workspaceId={workspace.id} />
         <AddBoardDialog workspaceId={workspace.id} />
       </div>
@@ -39,7 +40,7 @@ export default WorkspacePage;
 const PageSkeleton = () => (
   <div className="space-y-3 p-5">
     <InfoSkeleton />
-    <div className="w-full h-[0.1rem] rounded-full mt-3 bg-neutral-900/10" />
+    <Separator />
     <div className="grid justify-center w-full md:grid-cols-3 min-[412px]:grid-cols-2 sm:p-0 px-2 grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 lg:px-10 min-[412px]:gap-3 mt-5">
       <BoardSkeleton />
       <BoardSkeleton />

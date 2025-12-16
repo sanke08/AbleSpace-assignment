@@ -8,14 +8,14 @@ type Props = {
 
 const BoardList = ({ boards, workspaceId }: Props) => {
   if (!boards?.length) {
-    return <p className="text-sm text-muted-foreground">No boards found</p>;
+    return;
   }
   return (
     <>
       {boards.map((board) => (
         <Link
           key={board.id}
-          to={`/workspace/${workspaceId}/boards/${board.id}`}
+          to={`/${workspaceId}/boards/${board.id}`}
           className="w-full h-20 flex items-center border rounded-lg shadow"
         >
           <p className="p-2 text-sm font-medium text-center w-full">

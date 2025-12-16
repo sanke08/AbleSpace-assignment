@@ -22,9 +22,15 @@ export const getBoardsByWorkspaceId = ({
   });
 };
 
-export const findBoardById = ({ boardId }: { boardId: string }) => {
+export const findBoardById = ({
+  boardId,
+  workspaceId,
+}: {
+  boardId: string;
+  workspaceId: string;
+}) => {
   return db.board.findUnique({
-    where: { id: boardId },
+    where: { id: boardId, workspaceId },
     include: { workspace: true },
   });
 };
@@ -75,4 +81,26 @@ export const updateBoardTrash = ({
 
 export const deleteBoardById = ({ boardId }: { boardId: string }) => {
   return db.board.delete({ where: { id: boardId } });
+};
+
+export const getBoardDetail = ({
+  boardId,
+  workspaceId,
+  userId,
+}: {
+  boardId: string;
+  workspaceId: string;
+  userId: string;
+}) => {
+  return db.board.findUnique({
+    where: { id: boardId, workspaceId },
+    include: {
+      lists: true,
+      workspace: {
+        select: {
+          members: { where: { userId: userId } },
+        },
+      },
+    },
+  });
 };

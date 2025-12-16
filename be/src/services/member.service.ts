@@ -31,6 +31,7 @@ export const joinWorkspace = async ({
   inviteCode: string;
 }) => {
   const workspace = await workspaceRepository.findWorkspaceById({
+    userId,
     id: workspaceId,
   });
   if (!workspace) throw new AppError("Workspace not found", 404);
@@ -74,6 +75,7 @@ export const removeMember = async ({
 }) => {
   const workspace = await workspaceRepository.findWorkspaceById({
     id: workspaceId,
+    userId: actorId,
   });
   if (!workspace) throw new AppError("Workspace not found", 404);
 
@@ -120,6 +122,7 @@ export const updateRole = async ({
 }) => {
   const workspace = await workspaceRepository.findWorkspaceById({
     id: workspaceId,
+    userId: actorId,
   });
   if (!workspace) throw new AppError("Workspace not found", 404);
 
@@ -158,6 +161,7 @@ export const leaveWorkspace = async ({
 }) => {
   const workspace = await workspaceRepository.findWorkspaceById({
     id: workspaceId,
+    userId,
   });
   if (!workspace) throw new AppError("Workspace not found", 404);
 

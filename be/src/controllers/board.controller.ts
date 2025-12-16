@@ -5,6 +5,7 @@ import {
   createBoardSchema,
   updateBoardSchema,
   boardIdSchema,
+  boardDetailSchema,
 } from "../dtos/board.dto.js";
 import { AppError } from "../utils/appError.js";
 
@@ -41,6 +42,7 @@ export const createBoard = catchAsync(async (req, res) => {
 });
 
 export const updateBoard = catchAsync(async (req, res) => {
+  const { workspaceId } = req.params as { workspaceId: string };
   const validation = updateBoardSchema.safeParse(req.body);
   if (!validation.success) {
     const message = validation.error?.issues[0]?.message || "Validation error";
@@ -48,32 +50,44 @@ export const updateBoard = catchAsync(async (req, res) => {
   }
   const board = await boardService.updateBoardService({
     userId: req.user.id,
+    workspaceId,
     ...validation.data,
   });
   res.status(200).json({ status: "success", data: board });
 });
 
 export const trashBoard = catchAsync(async (req, res) => {
+  const { workspaceId } = req.params as { workspaceId: string };
   const validation = boardIdSchema.safeParse(req.params);
   if (!validation.success) {
     const message = validation.error?.issues[0]?.message || "Validation error";
     throw new AppError(message, 400);
   }
-  await boardService.trashBoard({ userId: req.user.id, ...validation.data });
+  await boardService.trashBoard({
+    userId: req.user.id,
+    boardId: validation.data.boardId,
+    workspaceId: workspaceId,
+  });
   res.status(200).json({ status: "success" });
 });
 
 export const restoreBoard = catchAsync(async (req, res) => {
+  const { workspaceId } = req.params as { workspaceId: string };
   const validation = boardIdSchema.safeParse(req.params);
   if (!validation.success) {
     const message = validation.error?.issues[0]?.message || "Validation error";
     throw new AppError(message, 400);
   }
-  await boardService.restoreBoard({ userId: req.user.id, ...validation.data });
+  await boardService.restoreBoard({
+    userId: req.user.id,
+    boardId: validation.data.boardId,
+    workspaceId: workspaceId,
+  });
   res.status(200).json({ status: "success" });
 });
 
 export const deleteBoard = catchAsync(async (req, res) => {
+  const { workspaceId } = req.params as { workspaceId: string };
   const validation = boardIdSchema.safeParse(req.params);
   if (!validation.success) {
     const message = validation.error?.issues[0]?.message || "Validation error";
@@ -81,7 +95,25 @@ export const deleteBoard = catchAsync(async (req, res) => {
   }
   await boardService.deleteBoardService({
     userId: req.user.id,
-    ...validation.data,
+    boardId: validation.data.boardId,
+    workspaceId: workspaceId,
   });
   res.status(204).send();
+});
+
+export const getBoardDetails = catchAsync(async (req, res) => {
+  const validation = boardDetailSchema.safeParse(req.params);
+  if (!validation.success) {
+    const message = validation.error?.issues[0]?.message || "Validation error";
+    throw new AppError(message, 400);
+  }
+  const board = await boardService.getBoardsDetails({
+    ...validation.data,
+    userId: req.user.id,
+  });
+  const { workspace, ...rest } = board;
+  res.status(200).json({
+    status: "success",
+    data: { member: workspace.members[0], board: { ...rest } },
+  });
 });

@@ -10,9 +10,9 @@ import { globalErrorHandler } from "./middlewares/globalErrorHandler.js";
 import authRouter from "./routes/auth.routes.js";
 import workspaceRouter from "./routes/workspace.routes.js";
 // import { AppError } from "./utils/appError.js";
-import taskRouter from "./routes/task.routes.js";
-import listRouter from "./routes/list.routes.js";
-import boardRouter from "./routes/board.routes.js";
+// import taskRouter from "./routes/task.routes.js";
+// import listRouter from "./routes/list.routes.js";
+// import boardRouter from "./routes/board.routes.js";
 
 const app: Express = express();
 
