@@ -107,8 +107,8 @@ enum PRIORITY {
 enum STATUS {
   TO_DO
   IN_PROGRESS
-  REVIEW
-  COMPLETED
+  IN_REVIEW
+  DONE
 }
 
 model Task {

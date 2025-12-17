@@ -19,7 +19,6 @@ export const useListSocket = (
 
     socket.on("error", (error) => {
       console.error("Socket error:", error);
-      // Show user-friendly error message
     });
 
     socket.on("connect_error", (error) => {

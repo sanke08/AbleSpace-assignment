@@ -7,7 +7,9 @@ const router: Router = Router({ mergeParams: true });
 router.use(protect);
 
 router.post("/", taskController.createTask);
-router.patch("/:taskId", taskController.updateTask);
+router.get("/:taskId", taskController.getTask);
+router.put("/:taskId", taskController.updateTask);
+router.patch("/:taskId/trash", taskController.trashTask);
 router.delete("/:taskId", taskController.deleteTask);
 
 export default router;

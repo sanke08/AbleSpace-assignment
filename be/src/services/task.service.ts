@@ -1,8 +1,16 @@
 import { db } from "../utils/db.js";
 import { AppError } from "../utils/appError.js";
-import { ACTION, ENTITY_TYPE, ROLE } from "../prisma/generated/prisma/enums.js";
+import {
+  ACTION,
+  ENTITY_TYPE,
+  PRIORITY,
+  ROLE,
+  STATUS,
+} from "../prisma/generated/prisma/enums.js";
 import { io } from "../server.js";
 import { findList } from "../repositories/list.repository.js";
+import * as taskRepository from "../repositories/task.repository.js";
+import { addAuditLog } from "./auditlog.service.js";
 
 export const createTask = async ({
   title,
@@ -23,32 +31,20 @@ export const createTask = async ({
 
   if (list.trash) throw new AppError("List is trashed", 400);
 
-  const task = await db.task.create({
-    data: {
-      title,
-      listId,
-    },
-  });
+  const task = await taskRepository.createTask({ title, listId });
 
   io.to(`board:${boardId}`).emit("task:created", task);
 
-  db.auditLog
-    .create({
-      data: {
-        workspaceId: list.board.workspaceId,
-        entityId: task.id,
-        entityType: ENTITY_TYPE.TASK,
-        entityTitle: task.title,
-        action: ACTION.CREATE,
-        userId,
-        userName: list.board.workspace.members[0]?.user.name || "",
-        userImage: list.board.workspace.members[0]?.user.avatar || "",
-      },
-    })
-    .catch((err) => {
-      console.log(err);
-      // Do further processing
-    });
+  addAuditLog({
+    workspaceId: list.board.workspaceId,
+    entityId: task.id,
+    entityType: ENTITY_TYPE.TASK,
+    entityTitle: task.title,
+    action: ACTION.CREATE,
+    userId,
+    userName: list.board.workspace.members[0]?.user.name || "",
+    userImage: list.board.workspace.members[0]?.user.avatar || "",
+  });
 
   return task;
 };
@@ -56,33 +52,65 @@ export const createTask = async ({
 export const updateTask = async ({
   taskId,
   boardId,
-  description,
   userId,
+  workspaceId,
+  listId,
+  data,
 }: {
   taskId: string;
   boardId: string;
-  description?: string;
   userId: string;
+  workspaceId: string;
+  listId: string;
+  data: {
+    title?: string | undefined;
+    description?: string | undefined | null;
+    status?: string | undefined;
+    priority?: string | undefined;
+    dueDate?: string | undefined | null;
+    assigneeId?: string | undefined | null;
+    assignedById?: string | undefined | null;
+  };
 }) => {
-  const task = await db.task.findUnique({
-    where: { id: taskId },
-    include: { list: { include: { board: true } } },
+  const task = await taskRepository.getTask({
+    taskId,
+    boardId,
+    userId,
+    workspaceId,
+    listId,
   });
 
   if (!task) throw new AppError("Task not found", 404);
 
-  const data: { description?: string } = {};
-  if (description) data.description = description;
+  const updateData: any = {};
+
+  if (data.title !== undefined) updateData.title = data.title;
+  if (data.description !== undefined) updateData.description = data.description;
+  if (data.status !== undefined) updateData.status = data.status as STATUS;
+  if (data.priority !== undefined)
+    updateData.priority = data.priority as PRIORITY;
+  if (data.dueDate !== undefined) {
+    updateData.dueDate = data.dueDate ? new Date(data.dueDate) : null;
+  }
+
+  if (data.assigneeId !== undefined) {
+    updateData.assigneeId = data.assigneeId;
+  }
+
+  if (data.assignedById !== undefined) {
+    updateData.assignedById = data.assignedById;
+  }
+
   const updated = await db.task.update({
     where: { id: taskId },
-    data,
+    data: updateData,
   });
 
   io.to(`board:${boardId}`).emit("task:updated", updated);
 
   await db.auditLog.create({
     data: {
-      workspaceId: task.list.board.workspaceId,
+      workspaceId: workspaceId,
       entityId: updated.id,
       entityType: ENTITY_TYPE.TASK,
       entityTitle: updated.title,
@@ -94,6 +122,41 @@ export const updateTask = async ({
   });
 
   return updated;
+};
+
+export const trashTask = async ({
+  boardId,
+  taskId,
+  userId,
+  workspaceId,
+  listId,
+}: {
+  boardId: string;
+  taskId: string;
+  userId: string;
+  workspaceId: string;
+  listId: string;
+}) => {
+  const task = await taskRepository.trashTask({
+    boardId,
+    taskId,
+    userId,
+    workspaceId,
+    listId,
+  });
+  io.to(`board:${boardId}`).emit("task:deleted", task);
+  addAuditLog({
+    workspaceId: workspaceId,
+    entityId: task.id,
+    entityType: ENTITY_TYPE.TASK,
+    entityTitle: task.title,
+    action: ACTION.TRASHED,
+    userId: task.list.board.workspace.members[0]?.id || "",
+    userName: task.list.board.workspace.members[0]?.user.name || "",
+    userImage: task.list.board.workspace.members[0]?.user.avatar || "",
+  });
+  const { list, ...rest } = task;
+  return rest;
 };
 
 export const deleteTask = async ({
@@ -132,16 +195,36 @@ export const deleteTask = async ({
 
   io.to(`board:${boardId}`).emit("task:deleted", deleted);
 
-  await db.auditLog.create({
-    data: {
-      workspaceId: task.list.board.workspaceId,
-      entityId: deleted.id,
-      entityType: ENTITY_TYPE.TASK,
-      entityTitle: deleted.title,
-      action: ACTION.DELETE,
-      userId,
-      userName: "snapshot",
-      userImage: "",
-    },
+  addAuditLog({
+    workspaceId: task.list.board.workspaceId,
+    entityId: deleted.id,
+    entityType: ENTITY_TYPE.TASK,
+    entityTitle: deleted.title,
+    action: ACTION.DELETE,
+    userId,
+    userName: "snapshot",
+    userImage: "",
+  });
+};
+
+export const getTask = async ({
+  taskId,
+  boardId,
+  userId,
+  workspaceId,
+  listId,
+}: {
+  taskId: string;
+  boardId: string;
+  userId: string;
+  workspaceId: string;
+  listId: string;
+}) => {
+  return await taskRepository.getTask({
+    taskId,
+    boardId,
+    userId,
+    workspaceId,
+    listId,
   });
 };

@@ -5,9 +5,9 @@ export const createBoardSchema = z.object({
 });
 
 export const updateBoardSchema = z.object({
-  id: z.string().uuid(),
+  // id: z.string().uuid(),
   title: z.string().optional(),
-  imageUrl: z.string().optional(),
+  // imageUrl: z.string().optional(),
 });
 
 export const boardIdSchema = z.object({

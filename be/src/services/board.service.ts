@@ -1,9 +1,9 @@
 import * as boardRepo from "../repositories/board.repository.js";
 import * as memberRepo from "../repositories/member.repository.js";
-import * as auditRepo from "../repositories/auditLog.repository.js";
 import { AppError } from "../utils/appError.js";
 import { ROLE, ENTITY_TYPE, ACTION } from "../prisma/generated/prisma/enums.js";
 import { UpdateBoardInput } from "../dtos/board.dto.js";
+import { addAuditLog } from "./auditlog.service.js";
 
 export const getBoards = async ({ name }: { name: string }) => {
   return boardRepo.findBoardsByName({ name });
@@ -34,7 +34,7 @@ export const createBoard = async ({
 
   const board = await boardRepo.createBoard({ title, workspaceId });
 
-  await auditRepo.createAuditLog({
+  addAuditLog({
     workspaceId,
     entityId: board.id,
     entityTitle: board.title,
@@ -50,38 +50,33 @@ export const createBoard = async ({
 
 export const updateBoardService = async ({
   userId,
-  id,
   title,
-  imageUrl,
   workspaceId,
-}: UpdateBoardInput & { userId: string; workspaceId: string }) => {
-  const board = await boardRepo.findBoardById({ boardId: id, workspaceId });
-  if (!board) throw new AppError("Board not found", 404);
-
-  const member = await memberRepo.findMember({
-    userId,
-    workspaceId: board.workspaceId,
-  });
-  if (!member || member.role === ROLE.MEMBER)
-    throw new AppError("Not authorized", 403);
-
-  const updated = await boardRepo.updateBoard(id, {
+  boardId,
+}: UpdateBoardInput & {
+  userId: string;
+  workspaceId: string;
+  boardId: string;
+}) => {
+  const board = await boardRepo.updateBoard({
+    boardId,
     title: title || "",
-    imageUrl: imageUrl || "",
+    workspaceId,
+    userId,
   });
 
-  await auditRepo.createAuditLog({
+  addAuditLog({
     workspaceId: board.workspaceId,
-    entityId: updated.id,
-    entityTitle: updated.title,
+    entityId: board.id,
+    entityTitle: board.title,
     entityType: ENTITY_TYPE.BOARD,
     action: ACTION.UPDATE,
     userId,
-    userName: member.user.name,
-    userImage: member.user.avatar || "",
+    userName: board.workspace.members[0]?.user.name || "",
+    userImage: board.workspace.members[0]?.user.avatar || "",
   });
 
-  return updated;
+  return board;
 };
 
 export const trashBoard = async ({
@@ -105,7 +100,7 @@ export const trashBoard = async ({
 
   await boardRepo.updateBoardTrash({ boardId, trash: true });
 
-  await auditRepo.createAuditLog({
+  addAuditLog({
     workspaceId: board.workspaceId,
     entityId: board.id,
     entityTitle: board.title,
@@ -138,7 +133,7 @@ export const restoreBoard = async ({
 
   await boardRepo.updateBoardTrash({ boardId, trash: false });
 
-  await auditRepo.createAuditLog({
+  addAuditLog({
     workspaceId: board.workspaceId,
     entityId: board.id,
     entityTitle: board.title,
@@ -171,7 +166,7 @@ export const deleteBoardService = async ({
 
   await boardRepo.deleteBoardById({ boardId });
 
-  await auditRepo.createAuditLog({
+  addAuditLog({
     workspaceId: board.workspaceId,
     entityId: board.id,
     entityTitle: board.title,

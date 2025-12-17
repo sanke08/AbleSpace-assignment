@@ -25,6 +25,7 @@ const BoardHeader = ({ board, member }: Props) => {
     boardId: board.id,
     workspaceId: board.workspaceId,
   });
+
   const trashMutation = useTrashBoard({
     boardId: board.id,
     workspaceId: board.workspaceId,

@@ -1,12 +1,11 @@
 import * as listRepo from "../repositories/list.repository.js";
 import * as memberRepo from "../repositories/member.repository.js";
-import * as auditRepo from "../repositories/auditLog.repository.js";
 import { AppError } from "../utils/appError.js";
-import { ROLE } from "../prisma/generated/prisma/enums.js";
 import { ENTITY_TYPE, ACTION } from "../prisma/generated/prisma/enums.js";
 import { CopyListInput } from "../dtos/list.dto.js";
 import { db } from "../utils/db.js";
 import { io } from "../server.js";
+import { addAuditLog } from "./auditlog.service.js";
 
 export const copyList = async ({
   userId,
@@ -37,7 +36,7 @@ export const copyList = async ({
     })),
   });
 
-  await auditRepo.createAuditLog({
+  addAuditLog({
     workspaceId: data.workspaceId,
     entityId: newList.id,
     entityType: ENTITY_TYPE.LIST,
@@ -70,30 +69,19 @@ export const trashList = async ({
   });
   if (!list) throw new AppError("List not found", 404);
 
-  console.log({ list });
-
-  const updated = await listRepo.updateListTrash({ listId, trash: true });
-  console.log({ updated });
+  await listRepo.updateListTrash({ listId, trash: true });
   io.to(`board:${boardId}`).emit("list:trashed", list);
 
-  db.auditLog
-    .create({
-      data: {
-        workspaceId: list.board.workspaceId,
-        entityId: list.id,
-        entityType: ENTITY_TYPE.LIST,
-        entityTitle: list.title,
-        action: ACTION.TRASHED,
-        userId,
-        userName: list.board.workspace.members[0]?.user.name || "", // fetch once if needed
-        userImage: list.board.workspace.members[0]?.user.avatar || "",
-      },
-    })
-    .catch((error) => {
-      // Log the error but don't block the response
-      console.error("Failed to create audit log:", error);
-      // Optionally: send to error tracking service
-    });
+  addAuditLog({
+    workspaceId: list.board.workspaceId,
+    entityId: list.id,
+    entityType: ENTITY_TYPE.LIST,
+    entityTitle: list.title,
+    action: ACTION.TRASHED,
+    userId,
+    userName: list.board.workspace.members[0]?.user.name || "", // fetch once if needed
+    userImage: list.board.workspace.members[0]?.user.avatar || "",
+  });
 };
 
 export const restoreList = async ({
@@ -117,7 +105,7 @@ export const restoreList = async ({
 
   await listRepo.updateListTrash({ listId, trash: false });
 
-  await auditRepo.createAuditLog({
+  addAuditLog({
     workspaceId: list.board.workspaceId,
     entityId: list.id,
     entityType: ENTITY_TYPE.LIST,
@@ -128,26 +116,6 @@ export const restoreList = async ({
     action: ACTION.RESTORED,
   });
 };
-
-// export const deleteList = async ({
-//   userId,
-//   listId,
-// }: {
-//   userId: string;
-//   listId: string;
-// }) => {
-//   const list = await listRepo.findListByIdWithWorkspace({ listId });
-//   if (!list) throw new AppError("List not found", 404);
-
-//   const member = await memberRepo.findMember({
-//     userId,
-//     workspaceId: list.board.workspaceId,
-//   });
-//   if (!member || member.role === ROLE.MEMBER)
-//     throw new AppError("Not authorized", 403);
-
-//   await listRepo.deleteListById({ listId });
-// };
 
 export const createList = async ({
   title,
@@ -170,24 +138,16 @@ export const createList = async ({
 
   io.to(`board:${boardId}`).emit("list:created", list);
 
-  db.auditLog
-    .create({
-      data: {
-        workspaceId: board.workspaceId,
-        entityId: list.id,
-        entityType: ENTITY_TYPE.LIST,
-        entityTitle: list.title,
-        action: ACTION.CREATE,
-        userId,
-        userName: "snapshot", // fetch once if needed
-        userImage: "",
-      },
-    })
-    .catch((error) => {
-      // Log the error but don't block the response
-      console.error("Failed to create audit log:", error);
-      // Optionally: send to error tracking service
-    });
+  addAuditLog({
+    workspaceId: board.workspaceId,
+    entityId: list.id,
+    entityType: ENTITY_TYPE.LIST,
+    entityTitle: list.title,
+    action: ACTION.CREATE,
+    userId,
+    userName: "snapshot", // fetch once if needed
+    userImage: "",
+  });
 
   return list;
 };
@@ -215,17 +175,15 @@ export const updateList = async ({
 
   io.to(`board:${boardId}`).emit("list:updated", updated);
 
-  await db.auditLog.create({
-    data: {
-      workspaceId,
-      entityId: list.id,
-      entityType: ENTITY_TYPE.LIST,
-      entityTitle: updated.title,
-      action: ACTION.UPDATE,
-      userId,
-      userName: "snapshot",
-      userImage: "",
-    },
+  addAuditLog({
+    workspaceId,
+    entityId: list.id,
+    entityType: ENTITY_TYPE.LIST,
+    entityTitle: updated.title,
+    action: ACTION.UPDATE,
+    userId,
+    userName: "snapshot",
+    userImage: "",
   });
 
   return updated;
@@ -249,7 +207,7 @@ export const deleteList = async ({
 
   io.to(`board:${boardId}`).emit("list:deleted", deleted);
 
-  await auditRepo.createAuditLog({
+  addAuditLog({
     workspaceId,
     entityId: list.id,
     entityType: ENTITY_TYPE.LIST,

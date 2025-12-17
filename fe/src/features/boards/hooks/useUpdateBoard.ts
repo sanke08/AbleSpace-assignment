@@ -1,5 +1,6 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { updateBoard } from "../api/boards.api";
+import { queryClient } from "@/lib/queryClient";
 
 export const useUpdateBoard = ({
   boardId,
@@ -8,13 +9,13 @@ export const useUpdateBoard = ({
   boardId: string;
   workspaceId: string;
 }) => {
-  const qc = useQueryClient();
-
   return useMutation({
     mutationFn: (payload: { title: string }) =>
       updateBoard(boardId, workspaceId, payload),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["board", boardId] });
+      queryClient.invalidateQueries({
+        queryKey: ["board", workspaceId, boardId],
+      });
     },
   });
 };

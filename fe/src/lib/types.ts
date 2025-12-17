@@ -1,7 +1,7 @@
 // Enums
 export type ROLE = "ADMIN" | "MEMBER";
 export type PRIORITY = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
-export type STATUS = "TO_DO" | "IN_PROGRESS" | "REVIEW" | "COMPLETED";
+export type STATUS = "TO_DO" | "IN_PROGRESS" | "IN_REVIEW" | "DONE";
 export type ENTITY_TYPE = "BOARD" | "LIST" | "TASK" | "MEMBER";
 export type ACTION =
   | "CREATE"

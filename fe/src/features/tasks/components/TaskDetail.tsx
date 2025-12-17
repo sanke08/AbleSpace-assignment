@@ -1,114 +1,78 @@
-import { Check, Loader2, Menu, Trash, Workflow } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Workflow } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import type { Task } from "@/lib/types";
-import { useUpdateTask } from "../hooks/useUpdateTask";
-import { useTrashTask } from "../hooks/useTrashTask";
-import { updateTaskSchema, type UpdateTaskInput } from "../schema/task.schema";
+import { useGetTask } from "../hooks/useGetTask";
+import TaskHeader from "./TaskHeader";
+import TaskDescription from "./TaskDescription";
+import TaskProperties from "./TaskProperties";
+import TaskActivity from "./TaskActivity";
 
 const TaskDetail = ({
-  task,
+  taskId,
   boardId,
   workspaceId,
+  listId,
 }: {
-  task: Task;
+  taskId: string;
   boardId: string;
   workspaceId: string;
+  listId: string;
 }) => {
-  const {
-    mutateAsync: updateTask,
-    isPending: updating,
-    isSuccess: updateSuccess,
-    error: updateError,
-  } = useUpdateTask();
-
-  const {
-    mutateAsync: trashTask,
-    isPending: deleting,
-    error: deleteError,
-  } = useTrashTask();
-
-  const form = useForm<UpdateTaskInput>({
-    resolver: zodResolver(updateTaskSchema),
-    defaultValues: {
-      description: task.description || "",
-    },
+  const { data: task, isLoading } = useGetTask({
+    taskId,
+    boardId,
+    workspaceId,
+    listId,
   });
 
-  const onSubmit = async (values: UpdateTaskInput) => {
-    await updateTask({
-      description: values.description || "",
-      boardId,
-      listId: task.listId,
-      taskId: task.id,
-      workspaceId,
-    });
-  };
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-neutral-400" />
+      </div>
+    );
+  }
 
-  const handleDelete = async () => {
-    await trashTask({
-      boardId,
-      listId: task.listId,
-      taskId: task.id,
-      workspaceId,
-    });
-  };
+  if (!task) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-neutral-500">
+        <Workflow className="w-12 h-12 mb-2" />
+        <p className="text-lg">Task not found</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center gap-2">
-        <Workflow />
-        <h2 className="text-2xl font-semibold">{task.title}</h2>
-      </div>
+    <div className=" p-6 space-y-6 w-max">
+      <TaskHeader
+        task={task}
+        boardId={boardId}
+        workspaceId={workspaceId}
+        listId={listId}
+      />
 
-      {/* Description */}
-      <div className="flex items-center gap-2 mt-4">
-        <Menu />
-        <p className="text-lg font-medium">Description</p>
-      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Content - Left Side */}
+        <div className="lg:col-span-2 space-y-6">
+          <TaskDescription
+            task={task}
+            boardId={boardId}
+            workspaceId={workspaceId}
+            listId={listId}
+          />
 
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="sm:flex gap-4 mt-2">
-          <div className="w-full">
-            <Textarea
-              {...form.register("description")}
-              placeholder="Add details about this task"
-              className="bg-neutral-100 max-h-[20rem]"
-            />
-
-            {/* {updateError && <ErrorField errorStr={updateError as any} />} */}
-            {/* {updateSuccess && <SuccessField successStr="Task updated" />} */}
-          </div>
-
-          {/* Actions */}
-          <div className="flex sm:flex-col gap-2 justify-end">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={handleDelete}
-              disabled={deleting}
-              className="rounded-full p-2"
-            >
-              {deleting ? <Loader2 className="animate-spin" /> : <Trash />}
-            </Button>
-
-            <Button
-              type="submit"
-              variant="ghost"
-              disabled={updating}
-              className="rounded-full bg-green-500 p-2"
-            >
-              {updating ? <Loader2 className="animate-spin" /> : <Check />}
-            </Button>
-          </div>
+          <TaskActivity taskId={task.id} />
         </div>
-      </form>
 
-      {/* {deleteError && <ErrorField errorStr={deleteError as any} />} */}
+        {/* Sidebar - Right Side */}
+        <div className="lg:col-span-1">
+          <TaskProperties
+            task={task}
+            boardId={boardId}
+            workspaceId={workspaceId}
+            listId={listId}
+          />
+        </div>
+      </div>
     </div>
   );
 };

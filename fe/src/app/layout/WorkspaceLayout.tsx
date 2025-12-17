@@ -7,6 +7,7 @@ import { Navbar } from "@/components/Navbar";
 import Sidebar from "@/components/sidebar/Sidebar";
 import type { User } from "@/lib/types";
 import { Toaster } from "@/components/ui/sonner";
+import SocketProvider from "../providers/SocketProvider";
 
 export default function WorkspaceLayout() {
   const { user, isLoading: userLoading } = useAuthUser();
@@ -21,7 +22,7 @@ export default function WorkspaceLayout() {
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/" replace />;
   }
 
   // Redirect to first workspace if at root path
@@ -30,17 +31,19 @@ export default function WorkspaceLayout() {
   }
 
   return (
-    <div className="px-24">
-      <Toaster />
-      <Navbar workspaces={workspaces} user={user as User} />
-      <div className="pt-14 mt-4 flex gap-10">
-        <div className=" min-w-60 max-w-60 w-60 sticky top-20 self-start border-r border-neutral-300 pr-2">
-          <Sidebar workspaces={workspaces} user={user as User} />
-        </div>
-        <div className="mt-2 w-full">
-          <Outlet />
+    <SocketProvider>
+      <div className="px-24">
+        <Toaster />
+        <Navbar workspaces={workspaces} user={user as User} />
+        <div className="pt-14 mt-4 flex gap-10">
+          <div className=" min-w-60 max-w-60 w-60 sticky top-20 self-start border-r border-neutral-300 pr-2">
+            <Sidebar workspaces={workspaces} user={user as User} />
+          </div>
+          <div className="mt-2 w-full">
+            <Outlet />
+          </div>
         </div>
       </div>
-    </div>
+    </SocketProvider>
   );
 }

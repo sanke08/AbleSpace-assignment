@@ -1,3 +1,4 @@
+import { ROLE } from "../prisma/generated/prisma/enums.js";
 import { db } from "../utils/db.js";
 
 export const findBoardsByName = ({ name }: { name: string }) => {
@@ -47,13 +48,19 @@ export const createBoard = ({
   });
 };
 
-export const updateBoard = (
-  boardId: string,
-  data: { title?: string; imageUrl?: string }
-) => {
+export const updateBoard = ({
+  boardId,
+  title,
+  userId,
+  workspaceId,
+}: {
+  boardId: string;
+  userId: string;
+  workspaceId: string;
+  title?: string;
+}) => {
   const updateData: Record<string, any> = {};
-  if (data.title !== undefined) updateData.title = data.title;
-  if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl;
+  if (title !== undefined) updateData.title = title;
 
   // If nothing to update, throw an error
   if (Object.keys(updateData).length === 0) {
@@ -61,7 +68,29 @@ export const updateBoard = (
   }
 
   return db.board.update({
-    where: { id: boardId },
+    where: {
+      id: boardId,
+      workspace: {
+        id: workspaceId,
+        members: { some: { userId, role: { in: [ROLE.ADMIN] } } },
+      },
+    },
+    select: {
+      title: true,
+      id: true,
+      workspaceId: true,
+      workspace: {
+        select: {
+          members: {
+            where: { userId },
+            select: {
+              id: true,
+              user: { select: { name: true, avatar: true } },
+            },
+          },
+        },
+      },
+    },
     data: updateData,
   });
 };
@@ -97,7 +126,9 @@ export const getBoardDetail = ({
     include: {
       lists: {
         where: { trash: false },
-        include: { tasks: { select: { id: true, title: true } } },
+        include: {
+          tasks: { where: { trash: false }, select: { id: true, title: true } },
+        },
       },
       workspace: {
         select: {

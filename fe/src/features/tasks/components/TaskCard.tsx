@@ -8,19 +8,19 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import type { Task } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import TaskDetail from "./TaskDetail";
 
 type Props = {
-  task: Task;
+  task: { id: string; title: string };
   index: number;
 
   boardId: string;
   workspaceId: string;
+  listId: string;
 };
 
-const TaskCard = ({ task, boardId, workspaceId }: Props) => {
+const TaskCard = ({ task, boardId, workspaceId, listId }: Props) => {
   const [searchParams] = useSearchParams();
   const isHovered = searchParams.get("hover") === task.id;
 
@@ -37,12 +37,17 @@ const TaskCard = ({ task, boardId, workspaceId }: Props) => {
         </div>
       </DialogTrigger>
 
-      <DialogContent className="w-[90%] md:w-[60%] lg:w-[50%] xl:w-[40%]">
+      <DialogContent className=" sm:w-fit md:w-fit lg:w-fit sm:max-w-fit">
         <DialogHeader>
           <DialogTitle>Task Detail</DialogTitle>
         </DialogHeader>
 
-        <TaskDetail task={task} boardId={boardId} workspaceId={workspaceId} />
+        <TaskDetail
+          taskId={task.id}
+          boardId={boardId}
+          workspaceId={workspaceId}
+          listId={listId}
+        />
       </DialogContent>
     </Dialog>
   );

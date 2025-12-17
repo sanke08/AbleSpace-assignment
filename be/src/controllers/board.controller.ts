@@ -44,7 +44,10 @@ export const createBoard = catchAsync(async (req, res) => {
 });
 
 export const updateBoard = catchAsync(async (req, res) => {
-  const { workspaceId } = req.params as { workspaceId: string };
+  const { workspaceId, boardId } = req.params as {
+    workspaceId: string;
+    boardId: string;
+  };
   const validation = updateBoardSchema.safeParse(req.body);
   if (!validation.success) {
     const message = validation.error?.issues[0]?.message || "Validation error";
@@ -53,7 +56,8 @@ export const updateBoard = catchAsync(async (req, res) => {
   const board = await boardService.updateBoardService({
     userId: req.user.id,
     workspaceId,
-    ...validation.data,
+    title: validation.data.title,
+    boardId,
   });
   res.status(200).json({ status: "success", data: board });
 });

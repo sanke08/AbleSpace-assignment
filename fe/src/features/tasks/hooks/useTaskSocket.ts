@@ -18,14 +18,14 @@ export const useTaskSocket = ({
   useEffect(() => {
     if (!socket) return;
 
-    socket.on(`task:create:${listId}`, onCreate);
-    socket.on(`task:update:${listId}`, onUpdate);
-    socket.on(`task:delete:${listId}`, onDelete);
+    socket.on(`task:created`, onCreate);
+    socket.on(`task:updated`, onUpdate);
+    socket.on(`task:deleted`, onDelete);
 
     return () => {
-      socket.off(`task:create:${listId}`, onCreate);
-      socket.off(`task:update:${listId}`, onUpdate);
-      socket.off(`task:delete:${listId}`, onDelete);
+      socket.off(`task:created`, onCreate);
+      socket.off(`task:updated`, onUpdate);
+      socket.off(`task:deleted`, onDelete);
     };
   }, [socket, listId, onCreate, onUpdate, onDelete]);
 };
