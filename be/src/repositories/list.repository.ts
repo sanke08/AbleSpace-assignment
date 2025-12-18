@@ -62,7 +62,10 @@ export const findList = ({
             include: {
               members: {
                 where: { userId },
-                select: { user: { select: { name: true, avatar: true } } },
+                select: {
+                  id: true,
+                  user: { select: { name: true, avatar: true } },
+                },
               },
             },
           },

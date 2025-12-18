@@ -6,15 +6,18 @@ import { login } from "../api/auth.api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const SignIn = ({ onToggle }: { onToggle: () => void }) => {
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
   });
 
+  const navigate = useNavigate();
+
   const mutation = useMutation({
     mutationFn: login,
-    onSuccess: () => window.location.reload(),
+    onSuccess: () => navigate("/"),
   });
 
   return (

@@ -1,5 +1,6 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { trashBoard } from "../api/boards.api";
+import { queryClient } from "@/lib/queryClient";
 
 export const useTrashBoard = ({
   boardId,
@@ -8,12 +9,18 @@ export const useTrashBoard = ({
   boardId: string;
   workspaceId: string;
 }) => {
-  const qc = useQueryClient();
-
   return useMutation({
     mutationFn: () => trashBoard({ boardId, workspaceId }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["boards", workspaceId] });
+      queryClient.invalidateQueries({
+        queryKey: ["board", workspaceId, boardId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["trashed-items", workspaceId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["workspace-boards", workspaceId],
+      });
     },
   });
 };

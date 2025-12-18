@@ -1,5 +1,4 @@
-// workspace/WorkspaceLayout.tsx
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { Loader } from "lucide-react";
 import useAuthUser from "@/features/auth/hooks/useAuthUser";
 import { useWorkspaceMembers } from "@/features/workspace/hooks/useWorkspaceMembers";
@@ -15,20 +14,18 @@ export default function WorkspaceLayout() {
   const { data: workspaces, isLoading: workspacesLoading } =
     useWorkspaceMembers();
 
-  const location = useLocation();
-
   if (userLoading || workspacesLoading) {
     return <Loader className="animate-spin" />;
   }
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/auth" replace />;
   }
 
   // Redirect to first workspace if at root path
-  if (location.pathname === "/" && workspaces && workspaces.length > 0) {
-    return <Navigate to={`/${workspaces[0].id}`} replace />;
-  }
+  // if (location.pathname === "/" && workspaces && workspaces.length > 0) {
+  //   return <Navigate to={`/${workspaces[0].id}`} replace />;
+  // }
 
   return (
     <SocketProvider>
@@ -36,7 +33,7 @@ export default function WorkspaceLayout() {
         <Toaster />
         <Navbar workspaces={workspaces} user={user as User} />
         <div className="pt-14 mt-4 flex gap-10">
-          <div className=" min-w-60 max-w-60 w-60 sticky top-20 self-start border-r border-neutral-300 pr-2">
+          <div className=" min-w-60 max-w-60 w-60 sticky top-18 self-start border-r border-neutral-300 pr-2">
             <Sidebar workspaces={workspaces} user={user as User} />
           </div>
           <div className="mt-2 w-full">

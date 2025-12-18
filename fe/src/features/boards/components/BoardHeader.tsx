@@ -1,4 +1,3 @@
-// features/boards/components/BoardNavbar.tsx
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -58,14 +57,13 @@ const BoardHeader = ({ board, member }: Props) => {
               </Button>
             </div>
 
-            {/* Delete */}
             <Button
               variant="destructive"
               onClick={() => trashMutation.mutate()}
               isLoading={trashMutation.isPending}
               className="w-full text-white"
             >
-              <Trash className="h-4 mr-2" /> Delete
+              <Trash className="h-4 mr-2" /> Move to Trash
             </Button>
           </PopoverContent>
         </Popover>

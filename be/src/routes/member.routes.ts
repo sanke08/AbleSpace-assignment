@@ -1,10 +1,13 @@
 import express, { type Router } from "express";
 import * as memberController from "../controllers/member.controller.js";
+import { protect } from "../middlewares/auth.middleware.js";
 
 const router: Router = express.Router({ mergeParams: true }); // Important for nested routes
 
 // Get all members of a workspace
-router.get("/", memberController.getWorkspaceMembers);
+router.get("/", protect, memberController.getWorkspaceMembers);
+router.delete("/:memberId", protect, memberController.removeMember);
+router.patch("/:memberId", protect, memberController.changeRole);
 
 // Add member to workspace
 // router.post("/", memberController.addMember);

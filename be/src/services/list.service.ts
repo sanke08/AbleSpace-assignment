@@ -74,11 +74,12 @@ export const trashList = async ({
 
   addAuditLog({
     workspaceId: list.board.workspaceId,
+    boardId: list.boardId,
     entityId: list.id,
     entityType: ENTITY_TYPE.LIST,
     entityTitle: list.title,
     action: ACTION.TRASHED,
-    userId,
+    userId: list.board.workspace.members[0]?.id || "",
     userName: list.board.workspace.members[0]?.user.name || "", // fetch once if needed
     userImage: list.board.workspace.members[0]?.user.avatar || "",
   });
@@ -107,10 +108,11 @@ export const restoreList = async ({
 
   addAuditLog({
     workspaceId: list.board.workspaceId,
+    boardId: list.boardId,
     entityId: list.id,
     entityType: ENTITY_TYPE.LIST,
     entityTitle: list.title,
-    userId,
+    userId: list.board.workspace.members[0]?.id || "",
     userName: list.board.workspace.members[0]?.user.name!,
     userImage: list.board.workspace.members[0]?.user.avatar || "",
     action: ACTION.RESTORED,
@@ -134,19 +136,37 @@ export const createList = async ({
       title,
       boardId,
     },
+    include: {
+      board: {
+        select: {
+          workspace: {
+            select: {
+              members: {
+                where: { userId },
+                select: {
+                  id: true,
+                  user: { select: { name: true, avatar: true } },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   });
 
   io.to(`board:${boardId}`).emit("list:created", list);
 
   addAuditLog({
     workspaceId: board.workspaceId,
+    boardId: boardId,
     entityId: list.id,
     entityType: ENTITY_TYPE.LIST,
     entityTitle: list.title,
     action: ACTION.CREATE,
-    userId,
-    userName: "snapshot", // fetch once if needed
-    userImage: "",
+    userId: list.board.workspace.members[0]?.id || "",
+    userName: list.board.workspace.members[0]?.user.name!, // fetch once if needed
+    userImage: list.board.workspace.members[0]?.user.avatar || "",
   });
 
   return list;
@@ -171,6 +191,23 @@ export const updateList = async ({
   const updated = await db.list.update({
     where: { id: listId, boardId },
     data: { title },
+    include: {
+      board: {
+        select: {
+          workspace: {
+            select: {
+              members: {
+                where: { userId },
+                select: {
+                  id: true,
+                  user: { select: { name: true, avatar: true } },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   });
 
   io.to(`board:${boardId}`).emit("list:updated", updated);
@@ -181,9 +218,9 @@ export const updateList = async ({
     entityType: ENTITY_TYPE.LIST,
     entityTitle: updated.title,
     action: ACTION.UPDATE,
-    userId,
-    userName: "snapshot",
-    userImage: "",
+    userId: updated.board.workspace.members[0]?.id || "",
+    userName: updated.board.workspace.members[0]?.user.name!, // fetch once if needed
+    userImage: updated.board.workspace.members[0]?.user.avatar || "",
   });
 
   return updated;

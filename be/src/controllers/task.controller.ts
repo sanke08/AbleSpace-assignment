@@ -102,3 +102,20 @@ export const trashTask = catchAsync(async (req: Request, res: Response) => {
   });
   res.status(204).send();
 });
+
+export const restoreTask = catchAsync(async (req: Request, res: Response) => {
+  const { taskId, boardId, workspaceId, listId } = req.params as {
+    taskId: string;
+    boardId: string;
+    workspaceId: string;
+    listId: string;
+  };
+  await taskService.restoreTask({
+    taskId,
+    boardId,
+    workspaceId,
+    listId,
+    userId: req.user.id,
+  });
+  res.status(204).send({ status: "success" });
+});

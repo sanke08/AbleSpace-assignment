@@ -104,19 +104,6 @@ export const getWorkspaceMembers = async (
       },
     });
 
-    // Transform the data to flatten user info
-    // const transformedMembers = members.map((member) => ({
-    //   id: member.id,
-    //   userId: member.user.id,
-    //   name: member.user.name,
-    //   email: member.user.email,
-    //   avatar: member.user.avatar,
-    //   role: member.role,
-    //   workspaceId: member.workspaceId,
-    //   createdAt: member.createdAt,
-    //   updatedAt: member.updatedAt,
-    // }));
-
     res.json(members);
   } catch (error) {
     next(error);
@@ -207,7 +194,7 @@ export const addMember = async (
   }
 };
 
-export const updateMemberRole = async (
+export const changeRole = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -251,17 +238,7 @@ export const updateMemberRole = async (
       },
     });
 
-    res.json({
-      id: member.id,
-      userId: member.user.id,
-      name: member.user.name,
-      email: member.user.email,
-      avatar: member.user.avatar,
-      role: member.role,
-      workspaceId: member.workspaceId,
-      createdAt: member.createdAt,
-      updatedAt: member.updatedAt,
-    });
+    res.json({ member });
   } catch (error) {
     next(error);
   }

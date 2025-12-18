@@ -17,8 +17,7 @@ export const getBoardsByWorkspaceId = ({
     select: {
       id: true,
       name: true,
-
-      boards: { select: { id: true, title: true } },
+      boards: { where: { trash: false }, select: { id: true, title: true } },
     },
   });
 };
@@ -122,7 +121,7 @@ export const getBoardDetail = ({
   userId: string;
 }) => {
   return db.board.findUnique({
-    where: { id: boardId, workspaceId },
+    where: { id: boardId, workspaceId, trash: false },
     include: {
       lists: {
         where: { trash: false },

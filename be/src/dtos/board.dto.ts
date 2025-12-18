@@ -11,7 +11,7 @@ export const updateBoardSchema = z.object({
 });
 
 export const boardIdSchema = z.object({
-  boardId: z.uuid(),
+  boardId: z.cuid(),
 });
 
 export const boardDetailSchema = z.object({

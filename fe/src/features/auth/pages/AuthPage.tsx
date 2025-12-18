@@ -1,11 +1,17 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import SignIn from "../components/SignIn";
 import SignUp from "../components/SignUp";
 import { twMerge } from "tailwind-merge";
+import useAuthUser from "../hooks/useAuthUser";
 
 const AuthPage = () => {
   const [toggle, setToggle] = useState(false);
+  const { isLoading, user } = useAuthUser();
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (user) return <Navigate to="/" replace />;
 
   return (
     <div className="fixed h-full w-full">

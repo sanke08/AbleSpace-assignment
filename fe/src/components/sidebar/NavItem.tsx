@@ -4,8 +4,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
 import type { Workspace, User } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import {
   Activity,
   Building,
@@ -15,7 +15,7 @@ import {
   Trash,
 } from "lucide-react";
 import { useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
 
 type Props = {
@@ -24,8 +24,6 @@ type Props = {
 };
 
 const NavItem = ({ workspace, user }: Props) => {
-  const disabled = workspace.creatorId !== user.id;
-  const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
   const [toggle, setToggle] = useState<boolean>(false);
@@ -33,22 +31,22 @@ const NavItem = ({ workspace, user }: Props) => {
   const routes = [
     {
       label: "Boards",
-      icon: <Layout className="h-4 w-4 mr-2" />,
+      icon: <Layout className="h-5 w-5" />,
       href: `/${workspace.id}`,
     },
     {
-      label: "Activity",
-      icon: <Activity className="h-4 w-4 mr-2" />,
-      href: `/${workspace.id}/activity`,
+      label: "Audits",
+      icon: <Activity className="h-5 w-5" />,
+      href: `/${workspace.id}/audits`,
     },
     {
       label: "Settings",
-      icon: <Settings className="h-4 w-4 mr-2" />,
+      icon: <Settings className="h-5 w-5" />,
       href: `/${workspace.id}/settings`,
     },
     {
       label: "Trash",
-      icon: <Trash className="h-4 w-4 mr-2" />,
+      icon: <Trash className="h-5 w-5" />,
       href: `/${workspace.id}/trash`,
     },
   ];
@@ -73,18 +71,13 @@ const NavItem = ({ workspace, user }: Props) => {
           )}
         </div>
       </AccordionTrigger>
-      <AccordionContent>
+      <AccordionContent className="border-b">
         {routes.map((route) => (
-          <Button
-            disabled={route.label === "Settings" && disabled}
+          <Link
+            to={route.href}
             key={route.label}
-            size="sm"
-            variant="ghost"
-            onClick={() => {
-              navigate(route.href);
-            }}
-            className={twMerge(
-              "w-full font-normal justify-start pl-10 hover:bg-sky-500/10",
+            className={cn(
+              "w-full font-normal flex gap-2 hover:bg-sky-500/10 py-2 px-5",
               (location.pathname === route.href ||
                 (params?.boardId && route.label === "Boards")) &&
                 "bg-sky-500/10 text-sky-700 my-[2px]"
@@ -92,7 +85,7 @@ const NavItem = ({ workspace, user }: Props) => {
           >
             {route.icon}
             {route.label}
-          </Button>
+          </Link>
         ))}
       </AccordionContent>
     </AccordionItem>

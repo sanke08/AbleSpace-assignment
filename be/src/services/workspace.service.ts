@@ -83,3 +83,29 @@ export const getWorkspaceById = async ({
     userId,
   });
 };
+
+export const getTrash = async ({
+  userId,
+  workspaceId,
+}: {
+  workspaceId: string;
+  userId: string;
+}) => {
+  return await workspaceRepository.findTrash({
+    id: workspaceId,
+    userId,
+  });
+};
+
+export const getTasks = async ({
+  workspaceId,
+  userId,
+}: {
+  workspaceId: string;
+  userId: string;
+}) => {
+  return await workspaceRepository.findTasks({
+    id: workspaceId,
+    userId,
+  });
+};

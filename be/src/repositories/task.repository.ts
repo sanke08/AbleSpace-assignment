@@ -107,3 +107,53 @@ export const trashTask = async ({
     },
   });
 };
+export const restoreTask = async ({
+  boardId,
+  taskId,
+  userId,
+  workspaceId,
+  listId,
+}: {
+  boardId: string;
+  taskId: string;
+  userId: string;
+  workspaceId: string;
+  listId: string;
+}) => {
+  return db.task.update({
+    where: {
+      id: taskId,
+      listId,
+      list: {
+        board: {
+          id: boardId,
+          workspace: { id: workspaceId, members: { some: { userId } } },
+        },
+      },
+    },
+    include: {
+      list: {
+        select: {
+          board: {
+            select: {
+              workspace: {
+                select: {
+                  members: {
+                    where: { userId },
+                    select: {
+                      id: true,
+                      user: { select: { name: true, avatar: true, id: true } },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    data: {
+      trash: false,
+    },
+  });
+};

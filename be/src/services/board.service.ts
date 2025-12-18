@@ -36,11 +36,12 @@ export const createBoard = async ({
 
   addAuditLog({
     workspaceId,
+    boardId: board.id,
     entityId: board.id,
     entityTitle: board.title,
     entityType: ENTITY_TYPE.BOARD,
     action: ACTION.CREATE,
-    userId,
+    userId: member.id,
     userName: member.user.name,
     userImage: member.user.avatar || "",
   });
@@ -67,11 +68,12 @@ export const updateBoardService = async ({
 
   addAuditLog({
     workspaceId: board.workspaceId,
+    boardId: board.id,
     entityId: board.id,
     entityTitle: board.title,
     entityType: ENTITY_TYPE.BOARD,
     action: ACTION.UPDATE,
-    userId,
+    userId: board.workspace.members[0]?.id || "",
     userName: board.workspace.members[0]?.user.name || "",
     userImage: board.workspace.members[0]?.user.avatar || "",
   });
@@ -102,11 +104,12 @@ export const trashBoard = async ({
 
   addAuditLog({
     workspaceId: board.workspaceId,
+    boardId: board.id,
     entityId: board.id,
     entityTitle: board.title,
     entityType: ENTITY_TYPE.BOARD,
     action: ACTION.TRASHED,
-    userId,
+    userId: member.id,
     userName: member.user.name,
     userImage: member.user.avatar || "",
   });
@@ -135,11 +138,12 @@ export const restoreBoard = async ({
 
   addAuditLog({
     workspaceId: board.workspaceId,
+    boardId: board.id,
     entityId: board.id,
     entityTitle: board.title,
     entityType: ENTITY_TYPE.BOARD,
     action: ACTION.RESTORED,
-    userId,
+    userId: member.id,
     userName: member.user.name,
     userImage: member.user.avatar || "",
   });
@@ -168,11 +172,12 @@ export const deleteBoardService = async ({
 
   addAuditLog({
     workspaceId: board.workspaceId,
+    boardId: board.id,
     entityId: board.id,
     entityTitle: board.title,
     entityType: ENTITY_TYPE.BOARD,
     action: ACTION.DELETE,
-    userId,
+    userId: member.id,
     userName: member.user.name,
     userImage: member.user.avatar || "",
   });

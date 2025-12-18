@@ -9,7 +9,7 @@ interface Props {
   user: User;
 }
 
-export const Navbar = ({}: Props) => {
+export const Navbar = ({ workspaces }: Props) => {
   return (
     <div className="fixed top-0 left-0 border-b  bg-white shadow-md w-full px-5">
       <div className="px-20 h-14 flex items-center justify-between">

@@ -12,5 +12,6 @@ export const useBoard = ({
     queryKey: ["board", workspaceId, boardId],
     enabled: !!workspaceId && !!boardId,
     queryFn: () => fetchBoard(workspaceId!, boardId!),
+    retry: 0,
   });
 };

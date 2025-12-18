@@ -1,8 +1,9 @@
 import { ACTION, ENTITY_TYPE } from "../prisma/generated/prisma/enums";
-import { db } from "../utils/db";
+import * as auditLogRepository from "../repositories/auditLog.repository";
 
 export const addAuditLog = async ({
   workspaceId,
+  boardId,
   entityId,
   entityType,
   entityTitle,
@@ -12,6 +13,7 @@ export const addAuditLog = async ({
   userImage,
 }: {
   workspaceId: string;
+  boardId?: string;
   entityId: string;
   entityType: ENTITY_TYPE;
   entityTitle: string;
@@ -20,21 +22,30 @@ export const addAuditLog = async ({
   userName: string;
   userImage: string;
 }) => {
-  db.auditLog
-    .create({
-      data: {
-        workspaceId,
-        entityId,
-        entityType,
-        entityTitle,
-        action,
-        userId,
-        userName,
-        userImage,
-      },
+  auditLogRepository
+    .createAuditLog({
+      workspaceId,
+      boardId,
+      entityId,
+      entityType,
+      entityTitle,
+      action,
+      userId,
+      userName,
+      userImage,
     })
     .catch((err) => {
       console.log(err);
       // Do further processing
     });
+};
+
+export const getAudits = async ({
+  workspaceId,
+  userId,
+}: {
+  workspaceId: string;
+  userId: string;
+}) => {
+  return auditLogRepository.getAudits({ workspaceId, userId });
 };

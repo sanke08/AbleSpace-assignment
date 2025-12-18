@@ -9,14 +9,14 @@ const BoardPage = () => {
     workspaceId: string;
     boardId: string;
   }>();
-  const { data, isLoading } = useBoard({
+  const { data, isLoading, error } = useBoard({
     boardId: boardId!,
     workspaceId: workspaceId!,
   });
 
   if (isLoading) return <Loader className="animate-spin" />;
 
-  if (!data) return <p>Board not found</p>;
+  if (!data || error) return <p>Board not found</p>;
 
   return (
     <div className="space-y-4">

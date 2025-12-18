@@ -41,7 +41,7 @@ export const update = catchAsync(async (req: Request, res: Response) => {
   }
 
   const workspace = await workspaceService.updateWorkspace({
-    workspaceId: req.params.id as string,
+    workspaceId: req.params.workspaceId as string,
     userId: req.user.id,
     data: validation.data,
   });
@@ -50,7 +50,7 @@ export const update = catchAsync(async (req: Request, res: Response) => {
 
 export const deleteWs = catchAsync(async (req: Request, res: Response) => {
   await workspaceService.deleteWorkspace({
-    workspaceId: req.params.id as string,
+    workspaceId: req.params.workspaceId as string,
     userId: req.user.id,
   });
   res.status(204).json({ status: "success", data: null });
@@ -58,8 +58,22 @@ export const deleteWs = catchAsync(async (req: Request, res: Response) => {
 
 export const get = catchAsync(async (req: Request, res: Response) => {
   const workspace = await workspaceService.getWorkspaceById({
-    workspaceId: req.params.id as string,
+    workspaceId: req.params.workspaceId as string,
     userId: req.user.id,
   });
   res.status(200).json({ status: "success", data: workspace });
+});
+
+export const getTrash = catchAsync(async (req: Request, res: Response) => {
+  const { workspaceId } = req.params as { workspaceId: string };
+  const userId = req.user.id;
+  const workspaces = await workspaceService.getTrash({ workspaceId, userId });
+  res.status(200).json({ status: "success", data: workspaces });
+});
+
+export const getTasks = catchAsync(async (req: Request, res: Response) => {
+  const workspaceId = req.params.workspaceId as string;
+  const userId = req.user.id;
+  const tasks = await workspaceService.getTasks({ workspaceId, userId });
+  res.status(200).json({ status: "success", data: tasks });
 });

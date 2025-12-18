@@ -3,10 +3,13 @@ import * as workspaceController from "../controllers/workspace.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
 import memberRouter from "./member.routes.js";
 import boardRouter from "./board.routes.js";
+import auditRouter from "./audit.routes.js";
 
 const router: Router = express.Router();
 
 router.use(protect); // All workspace routes need auth
+
+// router.post("/join/:inviteLink", protect, workspaceController.joinWorkspace);
 
 router
   .route("/")
@@ -14,12 +17,16 @@ router
   .post(workspaceController.create);
 
 router
-  .route("/:id")
+  .route("/:workspaceId")
   .get(workspaceController.get)
   .patch(workspaceController.update)
   .delete(workspaceController.deleteWs);
 
+router.route("/:workspaceId/trash").get(workspaceController.getTrash);
+router.route("/:workspaceId/tasks").get(workspaceController.getTasks);
+
 router.use("/:workspaceId/boards", boardRouter);
 router.use("/:workspaceId/members", memberRouter);
+router.use("/:workspaceId/audits", auditRouter);
 
 export default router;

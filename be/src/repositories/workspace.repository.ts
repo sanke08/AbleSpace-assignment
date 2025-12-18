@@ -31,6 +31,9 @@ export const findWorkspaceById = async ({
 }) => {
   return await db.workspace.findUnique({
     where: { id, members: { some: { userId } } },
+    include: {
+      members: { include: { user: true } },
+    },
   });
 };
 
@@ -66,5 +69,77 @@ export const updateWorkspace = async ({
 export const deleteWorkspace = async ({ id }: { id: string }) => {
   return await db.workspace.delete({
     where: { id },
+  });
+};
+
+export const findTrash = async ({
+  id,
+  userId,
+}: {
+  id: string;
+  userId: string;
+}) => {
+  const boards = await db.board.findMany({
+    where: {
+      workspaceId: id,
+      trash: true,
+      workspace: {
+        members: {
+          some: {
+            userId,
+          },
+        },
+      },
+    },
+  });
+
+  const lists = await db.list.findMany({
+    where: {
+      trash: true,
+      board: {
+        workspaceId: id,
+      },
+    },
+  });
+
+  const tasks = await db.task.findMany({
+    where: {
+      trash: true,
+      list: {
+        board: {
+          workspaceId: id,
+        },
+      },
+    },
+  });
+
+  return { boards, lists, tasks };
+};
+
+export const findTasks = async ({
+  id,
+  userId,
+}: {
+  id: string;
+  userId: string;
+}) => {
+  return await db.task.findMany({
+    where: {
+      assignee: {
+        userId,
+      },
+    },
+    include: {
+      list: {
+        select: {
+          boardId: true,
+          board: {
+            select: {
+              workspaceId: true,
+            },
+          },
+        },
+      },
+    },
   });
 };

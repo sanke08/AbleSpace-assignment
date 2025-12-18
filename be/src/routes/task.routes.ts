@@ -10,6 +10,7 @@ router.post("/", taskController.createTask);
 router.get("/:taskId", taskController.getTask);
 router.put("/:taskId", taskController.updateTask);
 router.patch("/:taskId/trash", taskController.trashTask);
+router.patch("/:taskId/restore", taskController.restoreTask);
 router.delete("/:taskId", taskController.deleteTask);
 
 export default router;

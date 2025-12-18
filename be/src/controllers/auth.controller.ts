@@ -68,3 +68,8 @@ export const me = catchAsync(async (req: Request, res: Response) => {
 
   res.status(200).json({ data: user });
 });
+
+export const logout = catchAsync(async (req: Request, res: Response) => {
+  res.cookie("jwt", "", { expires: new Date(0) });
+  res.status(200).json({ message: "Logged out successfully" });
+});

@@ -12,11 +12,6 @@ import { AppError } from "../utils/appError.js";
 export const getBoards = catchAsync(async (req, res) => {
   const { workspaceId } = req.params as { workspaceId: string };
   if (!workspaceId) throw new AppError("Workspace ID is required", 400);
-  // const workspace = await workspaceService.getWorkspaceById({
-  //   userId: req.user.id,
-  //   workspaceId,
-  // });
-  // if (!workspace) throw new AppError("Workspace not found", 404);
   const workspace = await boardService.getBoardsByWorkspaceId({
     workspaceId,
   });

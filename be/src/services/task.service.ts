@@ -37,11 +37,12 @@ export const createTask = async ({
 
   addAuditLog({
     workspaceId: list.board.workspaceId,
+    boardId: list.board.id,
     entityId: task.id,
     entityType: ENTITY_TYPE.TASK,
     entityTitle: task.title,
     action: ACTION.CREATE,
-    userId,
+    userId: list.board.workspace.members[0]?.id || "",
     userName: list.board.workspace.members[0]?.user.name || "",
     userImage: list.board.workspace.members[0]?.user.avatar || "",
   });
@@ -104,6 +105,33 @@ export const updateTask = async ({
   const updated = await db.task.update({
     where: { id: taskId },
     data: updateData,
+    include: {
+      list: {
+        select: {
+          board: {
+            select: {
+              id: true,
+              workspace: {
+                select: {
+                  id: true,
+                  members: {
+                    select: {
+                      id: true,
+                      user: {
+                        select: {
+                          name: true,
+                          avatar: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   });
 
   io.to(`board:${boardId}`).emit("task:updated", updated);
@@ -111,13 +139,14 @@ export const updateTask = async ({
   await db.auditLog.create({
     data: {
       workspaceId: workspaceId,
+      boardId: updated.list.board.id,
       entityId: updated.id,
       entityType: ENTITY_TYPE.TASK,
       entityTitle: updated.title,
       action: ACTION.UPDATE,
-      userId,
-      userName: "snapshot",
-      userImage: "",
+      userId: updated.list.board.workspace.members[0]?.id || "",
+      userName: updated.list.board.workspace.members[0]?.user.name || "",
+      userImage: updated.list.board.workspace.members[0]?.user.avatar || "",
     },
   });
 
@@ -147,6 +176,42 @@ export const trashTask = async ({
   io.to(`board:${boardId}`).emit("task:deleted", task);
   addAuditLog({
     workspaceId: workspaceId,
+    boardId: boardId,
+    entityId: task.id,
+    entityType: ENTITY_TYPE.TASK,
+    entityTitle: task.title,
+    action: ACTION.TRASHED,
+    userId: task.list.board.workspace.members[0]?.id || "",
+    userName: task.list.board.workspace.members[0]?.user.name || "",
+    userImage: task.list.board.workspace.members[0]?.user.avatar || "",
+  });
+  const { list, ...rest } = task;
+  return rest;
+};
+export const restoreTask = async ({
+  boardId,
+  taskId,
+  userId,
+  workspaceId,
+  listId,
+}: {
+  boardId: string;
+  taskId: string;
+  userId: string;
+  workspaceId: string;
+  listId: string;
+}) => {
+  const task = await taskRepository.restoreTask({
+    boardId,
+    taskId,
+    userId,
+    workspaceId,
+    listId,
+  });
+  io.to(`board:${boardId}`).emit("task:created", task);
+  addAuditLog({
+    workspaceId: workspaceId,
+    boardId: boardId,
     entityId: task.id,
     entityType: ENTITY_TYPE.TASK,
     entityTitle: task.title,
@@ -185,6 +250,15 @@ export const deleteTask = async ({
       workspaceId: task.list.board.workspaceId,
       role: ROLE.ADMIN,
     },
+    select: {
+      id: true,
+      user: {
+        select: {
+          name: true,
+          avatar: true,
+        },
+      },
+    },
   });
 
   if (!member) throw new AppError("Not authorized", 403);
@@ -201,9 +275,9 @@ export const deleteTask = async ({
     entityType: ENTITY_TYPE.TASK,
     entityTitle: deleted.title,
     action: ACTION.DELETE,
-    userId,
-    userName: "snapshot",
-    userImage: "",
+    userId: member.id,
+    userName: member.user.name,
+    userImage: member.user.avatar || "",
   });
 };
 
