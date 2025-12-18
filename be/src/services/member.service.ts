@@ -22,41 +22,49 @@ export const addMember = async ({
 };
 
 export const joinWorkspace = async ({
-  workspaceId,
+  // workspaceId,
   userId,
   inviteCode,
 }: {
-  workspaceId: string;
+  // workspaceId: string;
   userId: string;
   inviteCode: string;
 }) => {
-  const workspace = await workspaceRepository.findWorkspaceById({
-    userId,
-    id: workspaceId,
+  // const workspace = await workspaceRepository.findWorkspaceById({
+  //   userId,
+  //   // id: workspaceId,
+  // });
+  // if (!workspace) throw new AppError("Workspace not found", 404);
+
+  // if (workspace.inviteCode !== inviteCode) {
+  //   throw new AppError("Invalid invite code", 400);
+  // }
+
+  const workspace = await workspaceRepository.findWorkspaceByInviteCode({
+    inviteCode,
   });
   if (!workspace) throw new AppError("Workspace not found", 404);
 
-  if (workspace.inviteCode !== inviteCode) {
-    throw new AppError("Invalid invite code", 400);
-  }
-
-  const existing = await memberRepository.findMember({ workspaceId, userId });
-  if (existing) throw new AppError("Already a member", 400);
+  const existing = await memberRepository.findMember({
+    workspaceId: workspace.id,
+    userId,
+  });
+  if (existing) return existing;
 
   const member = await memberRepository.addMember({
-    workspaceId,
+    workspaceId: workspace.id,
     userId,
     role: ROLE.MEMBER,
   });
 
   // Log activity
   await auditLogRepository.createAuditLog({
-    workspaceId,
+    workspaceId: workspace.id,
     entityId: member.id,
     entityType: ENTITY_TYPE.MEMBER,
     entityTitle: member.user.name,
     action: ACTION.JOINED,
-    userId: userId,
+    userId: member.id,
     userImage: member.user.avatar || "",
     userName: member.user.name,
   });

@@ -9,7 +9,7 @@ export const useChangeRole = () => {
     mutationFn: changeRole,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["workspace-members", variables.workspaceId],
+        queryKey: ["workspace", variables.workspaceId],
       });
       toast.success("Member role updated successfully");
     },

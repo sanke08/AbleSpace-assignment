@@ -9,6 +9,7 @@ import Members from "./features/members/pages/Members";
 import AuditLogPage from "./features/audits/pages/AuditLogPage";
 import TrashPage from "./features/trash/pages/TrashPage";
 import HomePage from "./features/home/pages/HomePage";
+import InvitePage from "./features/invite/pages/InvitePage";
 
 const App = () => {
   return (
@@ -25,6 +26,7 @@ const App = () => {
         <Route path="/:workspaceId/trash" element={<TrashPage />} />
       </Route>
       <Route path="/auth" element={<AuthPage />} />
+      <Route path="/:workspaceId/:inviteCode" element={<InvitePage />} />
     </Routes>
   );
 };

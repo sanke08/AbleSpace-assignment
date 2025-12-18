@@ -4,15 +4,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useWorkspace } from "@/app/context/SettingsContext";
+import { useUpdateWorkspace } from "@/features/workspace/hooks/useUpdateWorkspace";
 
 const Settings = () => {
   const workspace = useWorkspace();
+  const { mutateAsync: updateWorkspace, isPending: isUpdating } =
+    useUpdateWorkspace();
 
-  const [title, setTitle] = useState(workspace?.name || "");
+  const [name, setName] = useState(workspace?.name || "");
 
-  const handleUpdate = () => {};
+  const handleUpdate = async () => {
+    await updateWorkspace({
+      workspaceId: workspace?.id || "",
+      name,
+    });
+  };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (
       window.confirm(
         "Are you sure you want to delete this workspace? This action cannot be undone."
@@ -40,19 +48,20 @@ const Settings = () => {
             <Image className="absolute left-3 h-5 w-5 text-neutral-500" />
             <Input
               id="workspace-title"
-              value={title}
+              value={name}
               placeholder="Workspace name"
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               className="pl-10 w-full md:w-2/3"
+              disabled={isUpdating}
             />
           </div>
 
           <Button
             onClick={handleUpdate}
-            // disabled={title.length === 0 || isUpdating}
+            disabled={name.length === 0 || isUpdating}
             className="w-full md:w-1/3"
           >
-            {false ? "Updating..." : "Update"}
+            {isUpdating ? "Updating..." : "Update"}
           </Button>
         </div>
       </div>

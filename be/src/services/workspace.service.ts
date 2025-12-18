@@ -6,7 +6,14 @@ import {
 } from "../dtos/workspace.dto.js";
 import { AppError } from "../utils/appError.js";
 import { ROLE } from "../prisma/generated/prisma/enums.js";
+import jwt from "jsonwebtoken";
+import { db } from "../utils/db.js";
 
+const generateRandomeCode = () => {
+  const randomNumber: number = Math.floor(Math.random() * 1000000);
+  const link = jwt.sign({ randomNumber }, "SECRET_TOKEN");
+  return link;
+};
 export const createWorkspace = async ({
   userId,
   data,
@@ -15,8 +22,7 @@ export const createWorkspace = async ({
   data: CreateWorkspaceInput;
 }) => {
   // Logic from nextjs: generate invite link (mocked or real)
-  const inviteCode =
-    "mock-invite-code-" + Math.random().toString(36).substring(7); // Simplified
+  const inviteCode = generateRandomeCode();
 
   // Create workspace
   const workspace = await workspaceRepository.createWorkspace({
@@ -108,4 +114,32 @@ export const getTasks = async ({
     id: workspaceId,
     userId,
   });
+};
+
+export const generateInviteLink = async ({
+  workspaceId,
+  userId,
+}: {
+  workspaceId: string;
+  userId: string;
+}) => {
+  const inviteCode = generateRandomeCode();
+
+  return await db.workspace.update({
+    where: { id: workspaceId, members: { some: { userId, role: ROLE.ADMIN } } },
+    data: { inviteCode },
+  });
+
+  // return await workspaceRepository.updateWorkspace({
+  //   id: workspaceId,
+  //   data: { inviteCode },
+  // });
+};
+
+export const getWorkspaceByInviteCode = async ({
+  inviteCode,
+}: {
+  inviteCode: string;
+}) => {
+  return await workspaceRepository.findWorkspaceByInviteCode({ inviteCode });
 };

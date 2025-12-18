@@ -14,16 +14,18 @@ import type { Workspace, Member } from "@/lib/types";
 interface MemberCardProps {
   member: Member;
   workspace: Workspace;
+  isOwner: boolean;
 }
 
-const MemberCard: React.FC<MemberCardProps> = ({ member, workspace }) => {
+const MemberCard: React.FC<MemberCardProps> = ({
+  member,
+  workspace,
+  isOwner,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const { mutate: removeMember, isPending: isRemoving } = useRemoveMember();
   const { mutate: changeRole, isPending: isChangingRole } = useChangeRole();
-
-  const isOwner = workspace.creatorId === member.userId;
-  const canModify = member.role === "MEMBER" || !isOwner;
 
   const handleRemove = () => {
     if (
@@ -93,7 +95,7 @@ const MemberCard: React.FC<MemberCardProps> = ({ member, workspace }) => {
 
       {/* Actions */}
       <div className="w-[10%]">
-        {canModify && (
+        {isOwner && (
           <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
               <Button

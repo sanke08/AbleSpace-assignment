@@ -31,7 +31,7 @@ export const getWorkspaceMembers = async ({
   page = 1,
   limit = 10,
 }: GetWorkspaceMembersParams): Promise<GetWorkspaceMembersResponse> => {
-  const { data } = await api.get(`/api/v1/workspaces/${workspaceId}/members`, {
+  const { data } = await api.get(`/workspaces/${workspaceId}/members`, {
     params: { page, limit },
   });
   return data;
@@ -41,7 +41,7 @@ export const removeMember = async ({
   workspaceId,
   memberId,
 }: RemoveMemberParams): Promise<void> => {
-  await api.delete(`/api/v1/workspaces/${workspaceId}/members/${memberId}`);
+  await api.delete(`/workspaces/${workspaceId}/members/${memberId}`);
 };
 
 export const changeRole = async ({
@@ -50,7 +50,7 @@ export const changeRole = async ({
   role,
 }: ChangeRoleParams): Promise<Member> => {
   const { data } = await api.patch(
-    `/api/v1/workspaces/${workspaceId}/members/${memberId}`,
+    `/workspaces/${workspaceId}/members/${memberId}`,
     { role }
   );
   return data;

@@ -9,8 +9,7 @@ export const createWorkspace = async (payload: CreateWorkspaceInput) => {
 
 interface UpdateWorkspaceParams {
   workspaceId: string;
-  title: string;
-  description?: string;
+  name: string;
 }
 
 interface GenerateInviteLinkParams {
@@ -31,26 +30,22 @@ export const getWorkspace = async ({
   workspaceId: string;
 }): Promise<Workspace> => {
   const { data } = await api.get(`/workspaces/${workspaceId}`);
-  console.log(data);
   return data.data;
 };
 
 export const updateWorkspace = async ({
   workspaceId,
-  ...updateData
+  name,
 }: UpdateWorkspaceParams): Promise<Workspace> => {
-  const { data } = await api.patch(
-    `/api/v1/workspaces/${workspaceId}`,
-    updateData
-  );
+  const { data } = await api.patch(`/workspaces/${workspaceId}`, { name });
   return data;
 };
 
 export const generateInviteLink = async ({
   workspaceId,
 }: GenerateInviteLinkParams): Promise<Workspace> => {
-  const { data } = await api.post(
-    `/api/v1/workspaces/${workspaceId}/generate-invite`
+  const { data } = await api.patch(
+    `/workspaces/${workspaceId}/generate-invite`
   );
   return data;
 };
@@ -58,11 +53,35 @@ export const generateInviteLink = async ({
 export const deleteWorkspace = async ({
   workspaceId,
 }: DeleteWorkspaceParams): Promise<void> => {
-  await api.delete(`/api/v1/workspaces/${workspaceId}`);
+  await api.delete(`/workspaces/${workspaceId}`);
 };
 
 export const leaveWorkspace = async ({
   workspaceId,
 }: LeaveWorkspaceParams): Promise<void> => {
-  await api.post(`/api/v1/workspaces/${workspaceId}/leave`);
+  await api.post(`/workspaces/${workspaceId}/leave`);
+};
+
+export const getWorkspaceByInviteCode = async ({
+  inviteCode,
+}: {
+  inviteCode: string;
+}): Promise<Workspace> => {
+  try {
+    const { data } = await api.get(`/workspaces/invite/${inviteCode}`);
+    return data.data;
+  } catch (error) {
+    console.log({ error });
+    throw error;
+  }
+};
+
+export const joinWorkspace = async ({ inviteCode }: { inviteCode: string }) => {
+  try {
+    const { data } = await api.post(`/workspaces/join`, { inviteCode });
+    return data.data;
+  } catch (error) {
+    console.log({ error });
+    return error;
+  }
 };

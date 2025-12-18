@@ -1,9 +1,11 @@
 import { useWorkspace } from "@/app/context/SettingsContext";
 import MemberCard from "../components/MemberCard";
+import useAuthUser from "@/features/auth/hooks/useAuthUser";
+import { Loader2 } from "lucide-react";
 
 const Members = () => {
   const workspace = useWorkspace();
-  console.log({ workspace });
+  const { user, isLoading } = useAuthUser();
 
   return (
     <div className="p-5 border border-neutral-900/20 rounded-lg h-full w-full mx-auto lg:w-full mt-2">
@@ -18,52 +20,29 @@ const Members = () => {
           <div className="w-[15%] hidden md:block">Joined</div>
           <div className="w-[10%]">Action</div>
         </div>
-
-        {/* Members List */}
-        <div className="space-y-2">
-          {workspace?.members && workspace.members.length > 0 ? (
-            workspace?.members.map((member) => (
-              <MemberCard
-                key={member.id}
-                member={member}
-                workspace={workspace}
-              />
-            ))
-          ) : (
-            <div className="text-center py-10 text-neutral-500">
-              No members found
-            </div>
-          )}
-        </div>
-
-        {/* Pagination */}
-        {/* {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-5 pt-5 border-t">
-            <p className="text-sm text-neutral-500">
-              Page {page} of {totalPages}
-            </p>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onPageChange(page - 1)}
-                disabled={!canGoPrevious}
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onPageChange(page + 1)}
-                disabled={!canGoNext}
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+        {isLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <Loader2 className="animate-spin" />
           </div>
-        )} */}
+        ) : (
+          //  {/* Members List */}
+          <div className="space-y-2">
+            {workspace?.members && workspace.members.length > 0 ? (
+              workspace?.members.map((member) => (
+                <MemberCard
+                  key={member.id}
+                  member={member}
+                  workspace={workspace}
+                  isOwner={workspace?.creatorId == user?.id}
+                />
+              ))
+            ) : (
+              <div className="text-center py-10 text-neutral-500">
+                No members found
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -16,9 +16,9 @@ export const join = catchAsync(async (req: Request, res: Response) => {
     throw new AppError(message, 400);
   }
 
-  const workspaceId = req.params.workspaceId as string;
+  // const workspaceId = req.params.workspaceId as string;
   const member = await memberService.joinWorkspace({
-    workspaceId,
+    // workspaceId,
     userId: req.user.id,
     inviteCode: validation.data.inviteCode,
   });
@@ -261,9 +261,7 @@ export const removeMember = async (
       where: {
         workspaceId,
         userId,
-        role: {
-          in: ["ADMIN"],
-        },
+        role: "ADMIN",
       },
     });
 

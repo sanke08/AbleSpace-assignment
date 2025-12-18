@@ -143,3 +143,18 @@ export const findTasks = async ({
     },
   });
 };
+
+export const findWorkspaceByInviteCode = async ({
+  inviteCode,
+}: {
+  inviteCode: string;
+}) => {
+  return await db.workspace.findUnique({
+    where: { inviteCode },
+    include: {
+      creator: true,
+      members: { include: { user: true } },
+      _count: { select: { members: true } },
+    },
+  });
+};

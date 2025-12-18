@@ -77,3 +77,25 @@ export const getTasks = catchAsync(async (req: Request, res: Response) => {
   const tasks = await workspaceService.getTasks({ workspaceId, userId });
   res.status(200).json({ status: "success", data: tasks });
 });
+
+export const generateInviteLink = catchAsync(
+  async (req: Request, res: Response) => {
+    const workspaceId = req.params.workspaceId as string;
+    const userId = req.user.id;
+    const workspace = await workspaceService.generateInviteLink({
+      workspaceId,
+      userId,
+    });
+    res.status(200).json({ status: "success", data: workspace });
+  }
+);
+
+export const getWorkspaceByInviteCode = catchAsync(
+  async (req: Request, res: Response) => {
+    const { inviteCode } = req.params as { inviteCode: string };
+    const workspace = await workspaceService.getWorkspaceByInviteCode({
+      inviteCode,
+    });
+    res.status(200).json({ status: "success", data: workspace });
+  }
+);

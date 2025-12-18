@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import WorkspaceInfo from "@/features/workspace/components/WorkspaceInfo";
 import { Input } from "@/components/ui/input";
+import { usegenerateInvideCode } from "@/features/workspace/hooks/usegenerateInvideCode";
 
 const SettingsLayout = () => {
   const { workspaceId } = useParams();
@@ -23,6 +24,10 @@ const SettingsLayout = () => {
   if (!workspaceId) return null;
 
   const { data: workspace, isPending } = useGetWorkspace(workspaceId);
+  const { mutateAsync: refresh, isPending: refreshPending } =
+    usegenerateInvideCode({
+      workspaceId,
+    });
 
   if (isPending) {
     return <Loader2 className="w-10 h-10 animate-spin" />;
@@ -38,6 +43,10 @@ const SettingsLayout = () => {
     await navigator.clipboard.writeText(inviteUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleRefresh = async () => {
+    await refresh();
   };
 
   return (
@@ -93,8 +102,18 @@ const SettingsLayout = () => {
                     )}
                   />
                 </Button>
-                <Button variant="ghost" className="h-8 w-8 p-1">
-                  <RefreshCcw />
+                {/* refresh invite code  */}
+                <Button
+                  onClick={handleRefresh}
+                  variant="ghost"
+                  className="h-8 w-8 p-1"
+                  disabled={refreshPending}
+                >
+                  {refreshPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <RefreshCcw />
+                  )}
                 </Button>
               </div>
 

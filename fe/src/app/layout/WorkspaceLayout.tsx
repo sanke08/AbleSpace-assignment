@@ -22,11 +22,6 @@ export default function WorkspaceLayout() {
     return <Navigate to="/auth" replace />;
   }
 
-  // Redirect to first workspace if at root path
-  // if (location.pathname === "/" && workspaces && workspaces.length > 0) {
-  //   return <Navigate to={`/${workspaces[0].id}`} replace />;
-  // }
-
   return (
     <SocketProvider>
       <div className="px-24">

@@ -8,7 +8,7 @@ export const useRemoveMember = () => {
     mutationFn: removeMember,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["workspace-members", variables.workspaceId],
+        queryKey: ["workspace", variables.workspaceId],
       });
       toast.success("Member removed successfully");
     },
