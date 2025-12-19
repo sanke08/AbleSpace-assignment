@@ -1,5 +1,5 @@
-import { ACTION, ENTITY_TYPE } from "../prisma/generated/prisma/enums";
-import * as auditLogRepository from "../repositories/auditLog.repository";
+import { ACTION, ENTITY_TYPE } from "../prisma/generated/prisma/enums.js";
+import * as auditLogRepository from "../repositories/auditLog.repository.js";
 
 export const addAuditLog = async ({
   workspaceId,

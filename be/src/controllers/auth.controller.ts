@@ -4,7 +4,6 @@ import * as authService from "../services/auth.service.js";
 import { registerSchema, loginSchema } from "../dtos/auth.dto.js";
 import { AppError } from "../utils/appError.js";
 import { createWorkspace } from "../services/workspace.service.js";
-import { db } from "../utils/db.js";
 
 const createSendToken = (
   user: any,

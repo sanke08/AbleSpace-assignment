@@ -1,6 +1,5 @@
 import { catchAsync } from "../utils/catchAsync.js";
 import * as boardService from "../services/board.service.js";
-import * as workspaceService from "../services/workspace.service.js";
 import {
   createBoardSchema,
   updateBoardSchema,

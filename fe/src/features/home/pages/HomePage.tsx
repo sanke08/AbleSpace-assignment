@@ -239,7 +239,7 @@
 
 // export default HomePage;
 
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Calendar, User, UserCheck } from "lucide-react";
 
 const HomePage = () => {
@@ -310,6 +310,7 @@ const HomePage = () => {
 
                   {task.dueDate && (
                     <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+                      Due Date:
                       <Calendar className="w-4 h-4" />
                       {new Date(task.dueDate).toLocaleDateString()}
                     </div>
@@ -319,7 +320,7 @@ const HomePage = () => {
                     <div className="border-t pt-4 space-y-3">
                       {task.assignee && (
                         <PersonRow
-                          label="Assignee"
+                          label="To"
                           name={task.assignee.user?.name}
                           email={task.assignee.user?.email}
                           icon={<User className="w-3.5 h-3.5" />}
@@ -328,7 +329,7 @@ const HomePage = () => {
 
                       {task.assignedBy && (
                         <PersonRow
-                          label="Assigned By"
+                          label="By"
                           name={task.assignedBy.user?.name}
                           icon={<UserCheck className="w-4 h-4" />}
                         />
@@ -354,6 +355,7 @@ type PersonRowProps = {
 
 const PersonRow = ({ label, name, email, icon }: PersonRowProps) => (
   <div className="flex items-center gap-3">
+    <p className="text-xs">{label}</p>
     <div
       className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold ${getAvatarColor(
         name
