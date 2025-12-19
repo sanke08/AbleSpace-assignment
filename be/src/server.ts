@@ -7,7 +7,7 @@ const server = http.createServer(app);
 // server.ts
 export const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173"], // Match Express
+    origin: ["http://localhost:5173", process.env.VITE_FE_URL!], // Match Express
     credentials: true,
   },
   transports: ["websocket", "polling"], // Add polling as fallback
