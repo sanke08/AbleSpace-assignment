@@ -252,7 +252,7 @@ const HomePage = () => {
       </div>
     );
   }
-
+  console.log(tasks);
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-8">
@@ -269,10 +269,7 @@ const HomePage = () => {
       ) : (
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {tasks.map((task) => {
-            const board = task.list?.board;
-            if (!board) return null;
-
-            const link = `/${board.workspaceId}/boards/${board.id}?hover=${task.id}`;
+            const link = `/${task?.list?.board?.workspaceId}/boards/${task?.list?.boardId}?hover=${task.id}`;
 
             return (
               <Link

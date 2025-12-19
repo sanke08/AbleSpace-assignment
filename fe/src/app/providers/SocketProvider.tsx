@@ -23,7 +23,7 @@ let socketInstance: Socket | null = null;
 const getSocketInstance = () => {
   if (!socketInstance) {
     socketInstance = io(
-      import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1",
+      import.meta.env.VITE_SOCKET_URL || "http://localhost:3000",
       {
         transports: ["websocket", "polling"],
         withCredentials: true,
