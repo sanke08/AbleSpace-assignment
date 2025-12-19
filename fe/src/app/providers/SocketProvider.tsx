@@ -22,14 +22,17 @@ let socketInstance: Socket | null = null;
 
 const getSocketInstance = () => {
   if (!socketInstance) {
-    socketInstance = io("http://localhost:3000", {
-      transports: ["websocket", "polling"],
-      withCredentials: true,
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-      autoConnect: true,
-    });
+    socketInstance = io(
+      import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1",
+      {
+        transports: ["websocket", "polling"],
+        withCredentials: true,
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        autoConnect: true,
+      }
+    );
   }
   return socketInstance;
 };
