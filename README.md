@@ -57,7 +57,6 @@ The application leverages **Socket.io** to provide a "Google Docs"-like collabor
 
 - **Live Board Updates**: Any changes to lists or tasks (creation, movement, updates) are reflected instantly for all users viewing the board.
 - **Room Management**: Users are grouped into rooms based on the `boardRef` they are currently viewing, ensuring updates are targeted and efficient.
-- **Optimistic Updates**: The frontend reflects changes immediately while syncing with the server in the background for a lag-free feel.
 
 ## ✨ Features
 
