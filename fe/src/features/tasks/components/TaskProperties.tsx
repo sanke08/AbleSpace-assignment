@@ -20,7 +20,7 @@ const TaskProperties = ({
   listId,
 }: TaskPropertiesProps) => {
   return (
-    <div className="rounded-lg border border-neutral-200 p-6 py-4 min-w-64 w-full">
+    <div className="rounded-lg border border-neutral-200 p-6 py-4 w-full">
       <h3 className="text-sm font-semibold text-neutral-500 uppercase tracking-wide pb-2">
         Details
       </h3>

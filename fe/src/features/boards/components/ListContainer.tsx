@@ -29,7 +29,7 @@ const ListContainer = ({
   useListSocket(boardId, handleCreate, handleDelete);
 
   return (
-    <div className="flex gap-3 overflow-x-auto hidescrollbar">
+    <div className="overflow-x-auto overflow-y-hidden hidescrollbar w-full h-full flex-1 flex gap-4 snap-mandatory snap-x">
       {lists.map((list) => (
         <ListItem key={list.id} list={list} workspaceId={workspaceId} />
       ))}

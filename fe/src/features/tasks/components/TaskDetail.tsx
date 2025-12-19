@@ -42,7 +42,7 @@ const TaskDetail = ({
   }
 
   return (
-    <div className=" p-6 space-y-6 w-max">
+    <div className="space-y-6 w-full">
       <TaskHeader
         task={task}
         boardId={boardId}
@@ -50,9 +50,9 @@ const TaskDetail = ({
         listId={listId}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:min-w-max w-full">
         {/* Main Content - Left Side */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className=" space-y-6 md:col-span-2">
           <TaskDescription
             task={task}
             boardId={boardId}
@@ -64,7 +64,7 @@ const TaskDetail = ({
         </div>
 
         {/* Sidebar - Right Side */}
-        <div className="lg:col-span-1">
+        <div className="col-span-1 md:min-w-60">
           <TaskProperties
             task={task}
             boardId={boardId}

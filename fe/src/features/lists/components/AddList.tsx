@@ -135,7 +135,7 @@ const AddList = ({
   };
 
   return (
-    <div className="min-w-[260px]">
+    <div className="min-w-[260px] snap-start">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button

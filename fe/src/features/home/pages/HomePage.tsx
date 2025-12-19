@@ -1,7 +1,129 @@
+// import { api } from "@/lib/axios";
+// import type { Task } from "@/lib/types";
+// import { useEffect, useState } from "react";
+// import { Link, useParams } from "react-router-dom";
+
+// const HomePage = () => {
+//   const { workspaceId } = useParams();
+//   const [tasks, setTasks] = useState<Task[]>([]);
+//   const [loading, setLoading] = useState(true);
+
+//   useEffect(() => {
+//     const fn = async () => {
+//       try {
+//         const { data } = await api.get(`/workspaces/${workspaceId}/tasks`);
+//         // Convert object with numeric keys to array
+//         const tasksArray = Object.values(data.data) as Task[];
+//         setTasks(tasksArray);
+//       } catch (error) {
+//         console.error("Error fetching tasks:", error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//     fn();
+//   }, [workspaceId]);
+
+//   console.log(tasks);
+
+//   const getPriorityColor = (priority: string) => {
+//     switch (priority) {
+//       case "URGENT":
+//         return "bg-red-100 text-red-800";
+//       case "HIGH":
+//         return "bg-orange-100 text-orange-800";
+//       case "MEDIUM":
+//         return "bg-yellow-100 text-yellow-800";
+//       case "LOW":
+//         return "bg-green-100 text-green-800";
+//       default:
+//         return "bg-gray-100 text-gray-800";
+//     }
+//   };
+
+//   const getStatusColor = (status: string) => {
+//     switch (status) {
+//       case "TO_DO":
+//         return "bg-blue-100 text-blue-800";
+//       case "IN_PROGRESS":
+//         return "bg-purple-100 text-purple-800";
+//       case "COMPLETED":
+//         return "bg-green-100 text-green-800";
+//       default:
+//         return "bg-gray-100 text-gray-800";
+//     }
+//   };
+
+//   if (loading) {
+//     return <div className="p-6">Loading tasks...</div>;
+//   }
+
+//   return (
+//     <div className="p-6">
+//       <h1 className="text-2xl font-bold mb-6">Tasks</h1>
+
+//       {tasks.length === 0 ? (
+//         <p className="text-gray-500">No tasks found</p>
+//       ) : (
+//         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+//           {tasks.map((task) => {
+//             const link = `/${task.list!.board!.workspaceId}/boards/${
+//               task.list!.boardId
+//             }?hover=${task.id}`;
+//             return (
+//               <Link
+//                 to={link}
+//                 key={task.id}
+//                 className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+//               >
+//                 <h3 className="font-semibold text-lg mb-2">{task.title}</h3>
+
+//                 {task.description && (
+//                   <p className="text-gray-600 mb-3">{task.description}</p>
+//                 )}
+
+//                 <div className="flex gap-2 mb-3">
+//                   <span
+//                     className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(
+//                       task.priority
+//                     )}`}
+//                   >
+//                     {task.priority}
+//                   </span>
+//                   <span
+//                     className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+//                       task.status
+//                     )}`}
+//                   >
+//                     {task.status.replace("_", " ")}
+//                   </span>
+//                 </div>
+
+//                 {task.dueDate && (
+//                   <p className="text-sm text-gray-500">
+//                     Due: {new Date(task.dueDate).toLocaleDateString()}
+//                   </p>
+//                 )}
+
+//                 <p className="text-xs text-gray-400 mt-2">
+//                   Created: {new Date(task.createdAt).toLocaleDateString()}
+//                 </p>
+//               </Link>
+//             );
+//           })}
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default HomePage;
+
 import { api } from "@/lib/axios";
 import type { Task } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { Calendar, User, UserCheck } from "lucide-react";
 
 const HomePage = () => {
   const { workspaceId } = useParams();
@@ -12,7 +134,6 @@ const HomePage = () => {
     const fn = async () => {
       try {
         const { data } = await api.get(`/workspaces/${workspaceId}/tasks`);
-        // Convert object with numeric keys to array
         const tasksArray = Object.values(data.data) as Task[];
         setTasks(tasksArray);
       } catch (error) {
@@ -24,95 +145,215 @@ const HomePage = () => {
     fn();
   }, [workspaceId]);
 
-  console.log(tasks);
-
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "URGENT":
-        return "bg-red-100 text-red-800";
+        return "bg-red-500 text-white";
       case "HIGH":
-        return "bg-orange-100 text-orange-800";
+        return "bg-orange-500 text-white";
       case "MEDIUM":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-500 text-white";
       case "LOW":
-        return "bg-green-100 text-green-800";
+        return "bg-green-500 text-white";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-500 text-white";
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "TO_DO":
-        return "bg-blue-100 text-blue-800";
+        return "bg-slate-100 text-slate-700 border border-slate-200";
       case "IN_PROGRESS":
-        return "bg-purple-100 text-purple-800";
+        return "bg-blue-100 text-blue-700 border border-blue-200";
       case "COMPLETED":
-        return "bg-green-100 text-green-800";
+        return "bg-emerald-100 text-emerald-700 border border-emerald-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-700 border border-gray-200";
     }
   };
 
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      "bg-blue-600",
+      "bg-emerald-600",
+      "bg-purple-600",
+      "bg-pink-600",
+      "bg-indigo-600",
+      "bg-rose-600",
+      "bg-amber-600",
+      "bg-teal-600",
+    ];
+    const index = name.charCodeAt(0) % colors.length;
+    return colors[index];
+  };
+
   if (loading) {
-    return <div className="p-6">Loading tasks...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Tasks</h1>
-
-      {tasks.length === 0 ? (
-        <p className="text-gray-500">No tasks found</p>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {tasks.map((task) => {
-            const link = `/${task.list!.board!.workspaceId}/boards/${
-              task.list!.boardId
-            }?hover=${task.id}`;
-            return (
-              <Link
-                to={link}
-                key={task.id}
-                className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
-              >
-                <h3 className="font-semibold text-lg mb-2">{task.title}</h3>
-
-                {task.description && (
-                  <p className="text-gray-600 mb-3">{task.description}</p>
-                )}
-
-                <div className="flex gap-2 mb-3">
-                  <span
-                    className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(
-                      task.priority
-                    )}`}
-                  >
-                    {task.priority}
-                  </span>
-                  <span
-                    className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
-                      task.status
-                    )}`}
-                  >
-                    {task.status.replace("_", " ")}
-                  </span>
-                </div>
-
-                {task.dueDate && (
-                  <p className="text-sm text-gray-500">
-                    Due: {new Date(task.dueDate).toLocaleDateString()}
-                  </p>
-                )}
-
-                <p className="text-xs text-gray-400 mt-2">
-                  Created: {new Date(task.createdAt).toLocaleDateString()}
-                </p>
-              </Link>
-            );
-          })}
+    <div className="">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Tasks</h1>
+          <p className="text-gray-600">
+            {tasks.length} {tasks.length === 1 ? "task" : "tasks"} in total
+          </p>
         </div>
-      )}
+
+        {tasks.length === 0 ? (
+          <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+            <div className="text-gray-400 mb-4">
+              <svg
+                className="w-16 h-16 mx-auto"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                />
+              </svg>
+            </div>
+            <p className="text-gray-500 text-lg">No tasks found</p>
+          </div>
+        ) : (
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {tasks.map((task) => {
+              const link = `/${task.list!.board!.workspaceId}/boards/${
+                task.list!.boardId
+              }?hover=${task.id}`;
+              return (
+                <Link
+                  to={link}
+                  key={task.id}
+                  className="group bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden border border-gray-100 hover:border-blue-200"
+                >
+                  <div className="p-5">
+                    {/* Header */}
+                    <div className="mb-4">
+                      <h3 className="font-semibold text-lg text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                        {task.title}
+                      </h3>
+                      {task.description && (
+                        <p className="text-gray-600 text-sm line-clamp-2">
+                          {task.description}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Status and Priority Badges */}
+                    <div className="flex gap-2 mb-4">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${getPriorityColor(
+                          task.priority
+                        )}`}
+                      >
+                        {task.priority}
+                      </span>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                          task.status
+                        )}`}
+                      >
+                        {task.status.replace("_", " ")}
+                      </span>
+                    </div>
+
+                    {/* Due Date */}
+                    {task.dueDate && (
+                      <div className="flex items-center gap-2 mb-4 text-sm text-gray-600">
+                        <Calendar className="w-4 h-4" />
+                        <span>
+                          Due {new Date(task.dueDate).toLocaleDateString()}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Divider */}
+                    {(task.assignee || task.assignedBy) && (
+                      <div className="border-t border-gray-100 my-4"></div>
+                    )}
+
+                    {/* People Section */}
+                    <div className="space-y-3">
+                      {task.assignee && (
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold shadow-sm ${getAvatarColor(
+                              task.assignee.user!.name
+                            )}`}
+                          >
+                            {getInitials(task.assignee.user!.name)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <User className="w-3.5 h-3.5 text-gray-400" />
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {task.assignee.user!.name}
+                              </p>
+                            </div>
+                            <p className="text-xs text-gray-500 truncate">
+                              {task.assignee.user!.email}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {task.assignedBy && (
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold shadow-sm ${getAvatarColor(
+                              task.assignedBy.user!.name
+                            )}`}
+                          >
+                            {getInitials(task.assignedBy.user!.name)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-gray-500 truncate">
+                              Assigned By
+                            </p>
+                            <div className="flex items-center gap-1.5">
+                              <UserCheck className="w-4 h-4 text-gray-400" />
+                              <p className=" text-gray-700 truncate">
+                                {task.assignedBy.user!.name}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Footer */}
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                      <p className="text-xs text-gray-400">
+                        Created {new Date(task.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

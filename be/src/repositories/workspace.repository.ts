@@ -130,6 +130,26 @@ export const findTasks = async ({
       },
     },
     include: {
+      assignedBy: {
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
+      },
+      assignee: {
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
+      },
       list: {
         select: {
           boardId: true,

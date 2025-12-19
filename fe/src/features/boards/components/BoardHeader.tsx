@@ -33,7 +33,7 @@ const BoardHeader = ({ board, member }: Props) => {
   const isAdmin = member?.role === "ADMIN";
 
   return (
-    <div className="w-full p-3 px-6 flex bg-neutral-200 justify-between items-center rounded">
+    <div className="w-full h-fit p-3 py-1 px-6 flex bg-neutral-200 justify-between items-center rounded">
       <p className="font-medium text-xl">{board.title}</p>
 
       {isAdmin && (

@@ -37,7 +37,7 @@ const TaskCard = ({ task, boardId, workspaceId, listId }: Props) => {
         </div>
       </DialogTrigger>
 
-      <DialogContent className=" sm:w-fit md:w-fit lg:w-fit sm:max-w-fit">
+      <DialogContent className="sm:max-w-full w-fit  overflow-y-auto overflow-x-hidden max-h-[80vh]">
         <DialogHeader>
           <DialogTitle>Task Detail</DialogTitle>
         </DialogHeader>

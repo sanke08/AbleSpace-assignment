@@ -19,8 +19,9 @@ const BoardPage = () => {
   if (!data || error) return <p>Board not found</p>;
 
   return (
-    <div className="space-y-4">
+    <div className=" min-h-[calc(100vh-6rem)] gap-3 w-full flex flex-col">
       <BoardHeader board={data.board} member={data.member} />
+
       <ListContainer
         lists={data.board.lists}
         workspaceId={workspaceId!}

@@ -36,15 +36,15 @@ const ListItem = ({ list, workspaceId }: Props) => {
   const isHovered = searchParams.get("hover") === list.id;
 
   return (
-    <li
+    <div
       className={cn(
-        "bg-neutral-100 p-2 rounded-md h-fit border w-80",
+        "bg-neutral-100 p-2 rounded-md h-fit border shrink-0 basis-[80%] md:basis-auto md:w-80 snap-start",
         isHovered && "bg-sky-200/80"
       )}
     >
       <ListHeader list={list} workspaceId={workspaceId} />
 
-      <ol className="flex flex-col space-y-2 mt-2">
+      <div className="flex flex-col space-y-2 mt-2">
         {tasks.map((task, index) => (
           <TaskCard
             key={task.id}
@@ -55,14 +55,14 @@ const ListItem = ({ list, workspaceId }: Props) => {
             listId={list.id}
           />
         ))}
-      </ol>
+      </div>
 
       <AddTask
         listId={list.id}
         boardId={list.boardId}
         workspaceId={workspaceId}
       />
-    </li>
+    </div>
   );
 };
 
