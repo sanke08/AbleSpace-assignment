@@ -74,7 +74,23 @@ export const getTrash = catchAsync(async (req: Request, res: Response) => {
 export const getTasks = catchAsync(async (req: Request, res: Response) => {
   const workspaceId = req.params.workspaceId as string;
   const userId = req.user.id;
-  const tasks = await workspaceService.getTasks({ workspaceId, userId });
+  const { search, status, priority, sortBy, sortOrder } = req.query as {
+    search?: string | undefined;
+    status?: string | undefined;
+    priority?: string | undefined;
+    sortBy?: string | undefined;
+    sortOrder?: "asc" | "desc" | undefined;
+  };
+
+  const tasks = await workspaceService.getTasks({
+    workspaceId,
+    userId,
+    search,
+    status,
+    priority,
+    sortBy,
+    sortOrder,
+  });
   res.status(200).json({ status: "success", data: tasks });
 });
 

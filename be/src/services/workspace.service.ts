@@ -106,13 +106,28 @@ export const getTrash = async ({
 export const getTasks = async ({
   workspaceId,
   userId,
+  search,
+  status,
+  priority,
+  sortBy,
+  sortOrder,
 }: {
   workspaceId: string;
   userId: string;
+  search?: string | undefined;
+  status?: string | undefined;
+  priority?: string | undefined;
+  sortBy?: string | undefined;
+  sortOrder?: "asc" | "desc" | undefined;
 }) => {
   return await workspaceRepository.findTasks({
     id: workspaceId,
     userId,
+    search,
+    status,
+    priority,
+    sortBy,
+    sortOrder,
   });
 };
 

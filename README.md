@@ -72,6 +72,11 @@ The application leverages **Socket.io** to provide a "Google Docs"-like collabor
   - Detailed descriptions.
 - **Audit Logs**: Detailed history of all activities within a workspace (Who did what and when).
 - **Trash & Recovery**: Safely delete items and restore them from the trash if needed.
+- **Advanced Task Search & Filtering**:
+  - Search tasks by title or description.
+  - Filter by Status and Priority.
+  - Sort by Creation Date, Due Date, Priority, or Title.
+  - **URL Persistence**: Filters are stored in URL search parameters, ensuring they persist across unmounts and are easily shareable.
 - **Member Management**: Role-based access (Admin/Member) and workspace invitation system.
 
 ## 📡 API Documentation

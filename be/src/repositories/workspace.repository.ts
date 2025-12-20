@@ -119,15 +119,43 @@ export const findTrash = async ({
 export const findTasks = async ({
   id,
   userId,
+  search,
+  status,
+  priority,
+  sortBy = "createdAt",
+  sortOrder = "desc",
 }: {
   id: string;
   userId: string;
+  search?: string | undefined;
+  status?: string | undefined;
+  priority?: string | undefined;
+  sortBy?: string | undefined;
+  sortOrder?: "asc" | "desc" | undefined;
 }) => {
   return await db.task.findMany({
     where: {
       assignee: {
         userId,
       },
+      ...(id !== "random" && {
+        list: {
+          board: {
+            workspaceId: id,
+          },
+        },
+      }),
+      ...(search && {
+        OR: [
+          { title: { contains: search, mode: "insensitive" } },
+          { description: { contains: search, mode: "insensitive" } },
+        ],
+      }),
+      ...(status && { status: status as any }),
+      ...(priority && { priority: priority as any }),
+    },
+    orderBy: {
+      [sortBy]: sortOrder,
     },
     include: {
       assignedBy: {

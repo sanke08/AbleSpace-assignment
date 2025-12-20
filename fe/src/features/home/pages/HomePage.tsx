@@ -239,11 +239,43 @@
 
 // export default HomePage;
 
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Calendar, User, UserCheck } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const HomePage = () => {
-  const { data: tasks = [], isLoading } = useGetMyTasks();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const search = searchParams.get("search") || "";
+  const status = searchParams.get("status") || "";
+  const priority = searchParams.get("priority") || "";
+  const sortBy = searchParams.get("sortBy") || "createdAt";
+  const sortOrder = (searchParams.get("sortOrder") as "asc" | "desc") || "desc";
+
+  const updateFilters = (updates: Record<string, string | undefined>) => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        Object.entries(updates).forEach(([key, value]) => {
+          if (value) {
+            next.set(key, value);
+          } else {
+            next.delete(key);
+          }
+        });
+        return next;
+      },
+      { replace: true }
+    );
+  };
+
+  const { data: tasks = [], isLoading } = useGetMyTasks({
+    search,
+    status: status || undefined,
+    priority: priority || undefined,
+    sortBy,
+    sortOrder,
+  });
 
   if (isLoading) {
     return (
@@ -252,19 +284,78 @@ const HomePage = () => {
       </div>
     );
   }
-  console.log(tasks);
+
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">My Tasks</h1>
-        <p className="text-gray-600">
-          {tasks.length} {tasks.length === 1 ? "task" : "tasks"}
-        </p>
+    <div className="max-w-7xl mx-auto pb-10">
+      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">My Tasks</h1>
+          <p className="text-gray-600">
+            {tasks.length} {tasks.length === 1 ? "task" : "tasks"}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="w-full md:w-64">
+            <Input
+              placeholder="Search tasks..."
+              value={search}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateFilters({ search: e.target.value })
+              }
+              className="bg-white"
+            />
+          </div>
+
+          <select
+            value={status}
+            onChange={(e) => updateFilters({ status: e.target.value })}
+            className="h-10 px-3 py-2 bg-white border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Statuses</option>
+            <option value="TO_DO">To Do</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="IN_REVIEW">In Review</option>
+            <option value="DONE">Done</option>
+          </select>
+
+          <select
+            value={priority}
+            onChange={(e) => updateFilters({ priority: e.target.value })}
+            className="h-10 px-3 py-2 bg-white border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Priorities</option>
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+            <option value="URGENT">Urgent</option>
+          </select>
+
+          <select
+            value={sortBy}
+            onChange={(e) => updateFilters({ sortBy: e.target.value })}
+            className="h-10 px-3 py-2 bg-white border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="createdAt">Created At</option>
+            <option value="dueDate">Due Date</option>
+            <option value="priority">Priority</option>
+            <option value="title">Title</option>
+          </select>
+
+          <button
+            onClick={() =>
+              updateFilters({ sortOrder: sortOrder === "asc" ? "desc" : "asc" })
+            }
+            className="h-10 px-3 py-2 bg-white border border-input rounded-md text-sm hover:bg-gray-50 flex items-center gap-2"
+          >
+            {sortOrder === "asc" ? "↑ Asc" : "↓ Desc"}
+          </button>
+        </div>
       </div>
 
       {tasks.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center text-gray-500">
-          No tasks found
+        <div className="bg-white rounded-xl shadow-sm p-12 text-center text-gray-500 border border-dashed border-gray-300">
+          No tasks match your filters
         </div>
       ) : (
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
